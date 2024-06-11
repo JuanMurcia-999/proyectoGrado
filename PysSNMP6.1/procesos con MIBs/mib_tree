@@ -1,0 +1,28 @@
+// MIB Tree
+digraph {
+	iso [label=iso]
+	"iso.org" [label=org]
+	iso -> "iso.org"
+	"iso.org.dod" [label=dod]
+	"iso.org" -> "iso.org.dod"
+	"iso.org.dod.internet" [label=internet]
+	"iso.org.dod" -> "iso.org.dod.internet"
+	"iso.org.dod.internet.mgmt" [label=mgmt]
+	"iso.org.dod.internet" -> "iso.org.dod.internet.mgmt"
+	"iso.org.dod.internet.mgmt.mib-2" [label="mib-2"]
+	"iso.org.dod.internet.mgmt" -> "iso.org.dod.internet.mgmt.mib-2"
+	"iso.org.dod.internet.mgmt.mib-2.system" [label=system]
+	"iso.org.dod.internet.mgmt.mib-2" -> "iso.org.dod.internet.mgmt.mib-2.system"
+	"iso.org.dod.internet.mgmt.mib-2.interfaces" [label=interfaces]
+	"iso.org.dod.internet.mgmt.mib-2" -> "iso.org.dod.internet.mgmt.mib-2.interfaces"
+	"iso.org.dod.internet.mgmt.mib-2.ip" [label=ip]
+	"iso.org.dod.internet.mgmt.mib-2" -> "iso.org.dod.internet.mgmt.mib-2.ip"
+	"iso.org.dod.internet.private" [label=private]
+	"iso.org.dod.internet" -> "iso.org.dod.internet.private"
+	"iso.org.dod.internet.private.enterprises" [label=enterprises]
+	"iso.org.dod.internet.private" -> "iso.org.dod.internet.private.enterprises"
+	"iso.org.dod.internet.private.enterprises.exampleEnterprise" [label=exampleEnterprise]
+	"iso.org.dod.internet.private.enterprises" -> "iso.org.dod.internet.private.enterprises.exampleEnterprise"
+	"iso.org.dod.internet.private.enterprises.exampleEnterprise.exampleMib" [label=exampleMib]
+	"iso.org.dod.internet.private.enterprises.exampleEnterprise" -> "iso.org.dod.internet.private.enterprises.exampleEnterprise.exampleMib"
+}
