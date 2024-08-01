@@ -3,24 +3,19 @@ from pysnmp.hlapi.asyncio.slim import Slim
 from pysnmp.smi.rfc1902 import ObjectIdentity, ObjectType
 import pdb
 
-async def run():
+async def slim_get(community, host, port, *VarBinds):
     
     
     with Slim(2) as slim:
         
         errorIndication, errorStatus, errorIndex, varBinds = await slim.get(
-            "public",
-            "192.168.20.25",
-            161,
-            ObjectType(ObjectIdentity('SNMPv2-MIB', 'sysName', 0))
+            community,
+            host,
+            port,
+            *VarBinds
             #.addMibSource('C:/Users/User/Desktop/Proyecto de grado/Librerias/PySNMP6.1/mibs-compiler/')
             
          )
-        
-        
-
-
-
 
         if errorIndication:
             print(errorIndication)
@@ -32,9 +27,4 @@ async def run():
                 )
             )
         else:
-            for varBind in varBinds:
-                #print(varBind)
-                print(" = ".join([x.prettyPrint() for x in varBind]))
-            
-
-
+            return varBinds

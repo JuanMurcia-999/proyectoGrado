@@ -2,10 +2,10 @@ from pysnmp.hlapi import *
 
 errorIndication, errorStatus, errorIndex, varBinds = bulkWalkCmd(SnmpEngine(),
             CommunityData('public', mpModel=1),
-            UdpTransportTarget(('192.168.20.22', 161)),
+            UdpTransportTarget(('192.168.20.25', 161)),
             ContextData(),
             0,1,
-            ObjectType(ObjectIdentity('1.3.6.1.2.1'))
+            ObjectType(ObjectIdentity('1.3.6.1.2.1.2.2.1.1'))
         
             
             )
@@ -22,8 +22,8 @@ elif errorStatus:
     )
 else:
     for obj in varBinds:
-        #print(varBind)
-        #print(" = ".join([x.prettyPrint() for x in varBind]))
+        #print(varBinds)
+        #print(" = ".join([x.prettyPrint() for x in varBinds]))
         oid = obj[0].prettyPrint()
         value = obj[1].prettyPrint()
         print(f'{oid} = {value}')
@@ -32,4 +32,3 @@ else:
 
 
 
-  
