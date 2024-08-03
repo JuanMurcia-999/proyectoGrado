@@ -1,13 +1,13 @@
 from sqlalchemy.orm import Session
 import models,schemas
 
+
 # Peticion que retorna todos los agentes en la base de datos
 def get_all_agent(db:Session):
     return db.query(models.Agents).all()
 
 #Query para creacion de Agents
 def create_agent(db:Session, agent: schemas.CreateAgent):
-
     db_agent= models.Agents(Hostname= agent.Hostname,
                             IP_address =agent.IP_address)
     db.add(db_agent)

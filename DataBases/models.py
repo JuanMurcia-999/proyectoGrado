@@ -40,14 +40,12 @@ class Managed_features(Base):
 
     id_feature = Column(Integer, autoincrement=True,primary_key=True)
     id_agent = Column(Integer,ForeignKey("agents.ID_agent"))
-   #file_name= Column(String, default='Desconocido') 
-   #obj_name = Column(String, default='Desconocido')
     oid= Column(String, nullable=False)
     description= Column(String, nullable=False)
     ip_agent= Column(String, nullable=False)
     timer = Column(Integer, nullable=False)
 
-    agent=relationship("Agents")
+    #ent=relationship("Agents")
     #agent=relationship("Agents",cascade='all,delete')
 
 
