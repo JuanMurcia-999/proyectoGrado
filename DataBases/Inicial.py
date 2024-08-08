@@ -27,18 +27,18 @@ async def Totalagentes():
     allelements=[]
     try:
         #recuperar las ips de todos los agentes
-        agents =db.query(models.Agents.IP_address).all()
+        agents =db.query(models.Agents).all()
         for agent in agents:
             IPS=[]
             TIMES=[]
             OIDS=[]
-            IPS.append(agent.IP_address)
+            IPS.append(agent.ip_address)
         #recuperar los tiempos unicos por cada agente
-            intervalos = db.query(models.Managed_features.timer).filter(models.Managed_features.ip_agent == f'{agent.IP_address}').distinct().all()
+            intervalos = db.query(models.Administered_features.timer).filter(models.Administered_features.id_agent == f'{agent.id_agent}').distinct().all()
             for inter in intervalos:
                 TIMES.append(inter.timer)
                 #Recuperar las features por cada intervalo
-                features = db.query(models.Managed_features.oid).filter(models.Managed_features.timer == f'{inter.timer}', models.Managed_features.ip_agent == f'{agent.IP_address}').all()
+                features = db.query(models.Administered_features.oid).filter(models.Administered_features.timer == f'{inter.timer}', models.Administered_features.id_agent == f'{agent.id_agent}').all()
                 OIDS.append( [item for (item,) in features])
             allelements.append(
                  {
@@ -48,7 +48,7 @@ async def Totalagentes():
                  }
             )
         #pasar los valores por agente a la funcion que crea los agentes   
-        #print(allelements) 
+        
         #await CreatorTask(allelements)
     finally:
         db.close()
@@ -100,7 +100,7 @@ async def pruebas():
     #print(type(date[0]))
 
 async def Inicial():
-    await pruebas()
+    #await pruebas()
     await Totalagentes()
-
+    print('Funcion inicial')
 #asyncio.run(Inicial())

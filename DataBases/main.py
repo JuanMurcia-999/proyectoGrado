@@ -43,20 +43,21 @@ def create_instance_startup():
     agents = crud.get_all_agent(db=SessionLocal())
     for agent in agents:
         instance=create_instance_from_Manageable(agent)
-        instances[agent.Hostname] = instance
+        instances[agent.ag_name] = instance
         print(instance)
     
     
 
 
 def create_instance_from_Manageable(request: schemas.Agent):
-    if request.ag_type =='PC':
-        return ManageablePC(request.IP_address, request.Hostname)
-    elif request.ag_type =='RoutCisco':
-        return ManageableRT(request.IP_address, request.Hostname)
+    if request.ag_type ==2:
+        return ManageablePC(request.ip_address, request.ag_name)
+    elif request.ag_type == 3:
+        return ManageableRT(request.ip_address, request.ag_name)
 
 
 app = FastAPI(lifespan=lifespan)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -67,7 +68,6 @@ app.add_middleware(
 )
 
 
-
 @app.get("/agents/all/",response_model=list[schemas.Agent])
 def read_agents(db:Session=Depends(get_db)):
     agents = crud.get_all_agent(db=db)
@@ -76,7 +76,7 @@ def read_agents(db:Session=Depends(get_db)):
 @app.post("/agents/create/",response_model=schemas.Agent)
 def create_agent(agent: schemas.CreateAgent, db:Session=Depends(get_db)):
     instance = create_instance_from_Manageable(agent)
-    instances[agent.Hostname] = instance
+    instances[agent.ag_name] = instance
     print(instance)
     return crud.create_agent(db=db, agent=agent)
 
@@ -88,7 +88,8 @@ def delete_agent(field:models.ModelField,value, db:Session=Depends(get_db)):
     return crud.delete_agent(db=db, field=field.name,value=value)
 
     
-# Endpoint de los features
+
+# Endpoint de las features
 @app.get("/agents/features/all/", response_model=list[schemas.Features])
 def read_features(db:Session=Depends(get_db)):
     features=crud.get_all_features(db=db)
@@ -102,9 +103,10 @@ def new_feature(feature: schemas.new_features, db:Session=Depends(get_db)):
 def delete_agent(field:models.ModelFieldSensor,value, db:Session=Depends(get_db)):
     return crud.delete_feature(db=db, field=field.name,value=value)
 
-@app.get("/agents/features/agent/{IP}", response_model=list[schemas.Features])
-def read_features(IP,db:Session=Depends(get_db)):
-    features=crud.get_all_features_agent(db=db,value=IP)
+
+@app.get("/agents/features/agent/{ID}", response_model=list[schemas.Features])
+def read_features(ID,db:Session=Depends(get_db)):
+    features=crud.get_all_features_agent(db=db,value=ID)
     return features
 
 @app.get("/iftable/{host}",response_model=list[schemas.iftable])
@@ -145,7 +147,7 @@ async def create_instance(request: schemas.Manageable):
     if not instance:
         raise HTTPException(status_code=404, detail="Instance not found")
     await instance.saludar()
-    #await instance.Networktraffic('12', 10, request.nametask)
+    await instance.Networktraffic('12', 10, request.nametask)
     return {"result": 'Instancia creada'}
 
 

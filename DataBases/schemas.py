@@ -1,30 +1,29 @@
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, date, time
 
 #esquema de datos para los elementos de la tabla Agents
 
 
 #Escritura
 class CreateAgent(BaseModel):
-    Hostname:str
-    IP_address:str
-    ag_type:str
+    ag_name:str
+    ip_address:str
+    ag_type:int
 
 #Lectura
 class Agent(CreateAgent):
-    ID_agent:int
+    id_agent:int
 
 
 # Lectura de features
 class new_features(BaseModel):
     id_agent :int
-    ip_agent:str
     oid: str
-    description:str
+    adminis_name:str
     timer : int
 
 class Features(new_features):
-    id_feature:int
+    id_adminis:int
 
 
 
@@ -57,23 +56,22 @@ class SensorCreate(BaseModel):
     description:str
     interval: str
 
-class SensorRead():
-    pass
-
 
 class addHistory(BaseModel):
-    ip_agent:str
-    oid:str
+    id_agent:int
+    id_adminis:int
     value:str
 
 class readHistory(addHistory):
-    id_his_feature:int
-    created_at:datetime
+    id_register:int
+    date:date
+    time:time
 
 
 class getHistory(BaseModel):
-    ip_agent:str
-    oid:str
+    id_agent:int
+    id_adminis:int
+
 
 class responseHistory(BaseModel):
     value:list[str]
@@ -84,7 +82,9 @@ class responseHistory(BaseModel):
 
 class addDefaultFeature(BaseModel):
     fe_name:str
-    ag_type: str
+    id_type:int
+
+
 
 class stoptask(BaseModel):
     name:str
