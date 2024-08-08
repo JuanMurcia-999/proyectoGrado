@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 import models,schemas
 
 
@@ -77,12 +78,29 @@ def get_all_history(db:Session):
     return db.query(models.History_features).all()
 
 def get_history_sensor(db:Session,filter:schemas.getHistory):
-    
     response = db.query(models.History_features.value,models.History_features.created_at).filter(models.History_features.oid == filter.oid  ,models.History_features.ip_agent == filter.ip_agent)
     values = [item[0] for item in response]
     date =  [item[1].strftime('%Y-%m-%d %H:%M:%S')    for item in response]
-
     return {
         'value': values,
         'created_at': date
     }
+
+
+# Lista de features preestablecidas segun el tipo
+
+def add_default_feature(db:Session, feature: schemas.addDefaultFeature):
+
+    db_defFeatures= models.Default_features  (
+        fe_name= feature.fe_name,
+        ag_type = feature.ag_type
+            )
+
+    db.add(db_defFeatures)
+    db.commit()
+    db.refresh(db_defFeatures)
+    return db_defFeatures
+
+def get_all_default_features(db: Session,value):
+    return db.query(models.Default_features).filter( or_( models.Default_features.ag_type == value ,
+                                                          models.Default_features.ag_type == 'all')).all()

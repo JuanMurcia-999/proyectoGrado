@@ -82,7 +82,9 @@ class responseHistory(BaseModel):
 
 #/////////////Modelos de los gestionables establecidos//////////////
 
-
+class addDefaultFeature(BaseModel):
+    fe_name:str
+    ag_type: str
 
 class stoptask(BaseModel):
     name:str

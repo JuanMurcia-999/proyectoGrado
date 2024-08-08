@@ -39,8 +39,8 @@ class Managed_features(Base):
     __tablename__ = "managed_features"
 
     id_feature = Column(Integer, autoincrement=True,primary_key=True)
-    id_agent = Column(Integer,ForeignKey("agents.ID_agent"))
-    oid= Column(String, nullable=False)
+    id_agent = Column(Integer,ForeignKey("agents.ID_agent"),nullable=False)
+    oid= Column(String, nullable=True, default='N/A')
     description= Column(String, nullable=False)
     ip_agent= Column(String, nullable=False)
     timer = Column(Integer, nullable=False)

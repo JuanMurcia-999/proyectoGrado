@@ -31,7 +31,6 @@ srcDirectories = ["C:/Users/Juan Murcia/Desktop/Proyecto de grado/mibs"]
 dstDirectory = "C:/Users/Juan Murcia/Desktop/Proyecto de grado/Desarrollo/Recolector/mibs-compiler"
 
 # Initialize compiler infrastructure
-
 mibCompiler = MibCompiler(SmiStarParser(), PySnmpCodeGen(), PyFileWriter(dstDirectory))
 
 # search for source MIBs here

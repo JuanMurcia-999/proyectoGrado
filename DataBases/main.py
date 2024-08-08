@@ -127,6 +127,18 @@ def read_history_sensor(filter: schemas.getHistory, db:Session=Depends(get_db)):
     return crud.get_history_sensor(db=db, filter=filter)
 
 
+# Gestionables por defecto
+
+@app.post("/features/deafult/new/",response_model=schemas.addDefaultFeature)
+def new_feature(feature: schemas.addDefaultFeature, db:Session=Depends(get_db)):
+    return crud.add_default_feature(db=db, feature=feature)
+
+
+@app.get("/features/default/agent/",response_model=list[schemas.addDefaultFeature]) 
+def get_deafult_feature_agent(value:str, db:Session=Depends(get_db)):
+    return crud.get_all_default_features(db=db,value=value)
+
+
 @app.post("/exect-task/")
 async def create_instance(request: schemas.Manageable):
     instance = instances.get(request.name)
@@ -146,4 +158,3 @@ async def stop_instance(request:schemas.stoptask):
     instance.cancelar_tarea(request.nametask)
     await instance.Iniciar()
     return {"result": 'tarea cancelada'}
-
