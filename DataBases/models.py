@@ -1,8 +1,7 @@
-from sqlalchemy import Column,ForeignKey, Integer,String,Date
+from sqlalchemy import Column,ForeignKey, Integer,String,DateTime
 from sqlalchemy.orm import relationship
-
 from database import Base
-
+from sqlalchemy.sql import func
 from enum import Enum
 
 #Definicion de los modelos de datos extras
@@ -32,6 +31,7 @@ class Agents(Base):
     ID_agent = Column(Integer, autoincrement=True,primary_key=True)
     Hostname = Column(String, nullable=False,unique=True)
     IP_address=Column(String,nullable=False,unique=True)
+    ag_type= Column(String, nullable=False)
 
     feature=relationship("Managed_features",cascade='all,delete')
 
@@ -44,11 +44,22 @@ class Managed_features(Base):
     description= Column(String, nullable=False)
     ip_agent= Column(String, nullable=False)
     timer = Column(Integer, nullable=False)
-
-    #ent=relationship("Agents")
-    #agent=relationship("Agents",cascade='all,delete')
-
-
-
-
     
+ 
+class Default_features(Base):
+    __tablename__ ='default_features'
+
+    id_feature = Column(Integer, autoincrement=True,primary_key=True)
+    fe_name = Column(String, nullable=False)
+    ag_type =Column(String, nullable=False)
+
+
+
+class History_features(Base):
+    __tablename__ ="history_features"
+
+    id_his_feature = Column(Integer, autoincrement=True,primary_key=True)
+    ip_agent= Column(String, nullable=False)
+    oid= Column(String, nullable=False)
+    value =Column(String, nullable=False)
+    created_at = Column(DateTime, server_default=func.now())

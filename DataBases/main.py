@@ -3,21 +3,25 @@ import os
 import asyncio
 # Añade el directorio raíz al sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from contextlib import asynccontextmanager
+
 from ifTable import interfaceTable
 from fastapi import Depends,FastAPI,HTTPException
-from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
+
+
+from contextlib import asynccontextmanager
 from sqlalchemy.orm import Session
 import crud,models,schemas
 from database import SessionLocal,engine
 from Inicial import Inicial
-from fastapi import FastAPI
+from Manageable import ManageablePC, ManageableRT
+
 
 models.Base.metadata.create_all(bind=engine)  # crea la base de datos si no existe
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    create_instance_startup()
     asyncio.create_task(Inicial())
     yield
 
@@ -26,8 +30,7 @@ origins=[
     "http://localhost:8080",
 ]
 
-
-
+instances={}
 
 def get_db():
     db=SessionLocal()
@@ -36,8 +39,23 @@ def get_db():
     finally:
         db.close()
 
-
+def create_instance_startup():
+    agents = crud.get_all_agent(db=SessionLocal())
+    for agent in agents:
+        instance=create_instance_from_Manageable(agent)
+        instances[agent.Hostname] = instance
+        print(instance)
     
+    
+
+
+def create_instance_from_Manageable(request: schemas.Agent):
+    if request.ag_type =='PC':
+        return ManageablePC(request.IP_address, request.Hostname)
+    elif request.ag_type =='RoutCisco':
+        return ManageableRT(request.IP_address, request.Hostname)
+
+
 app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
@@ -49,6 +67,7 @@ app.add_middleware(
 )
 
 
+
 @app.get("/agents/all/",response_model=list[schemas.Agent])
 def read_agents(db:Session=Depends(get_db)):
     agents = crud.get_all_agent(db=db)
@@ -56,12 +75,17 @@ def read_agents(db:Session=Depends(get_db)):
 
 @app.post("/agents/create/",response_model=schemas.Agent)
 def create_agent(agent: schemas.CreateAgent, db:Session=Depends(get_db)):
+    instance = create_instance_from_Manageable(agent)
+    instances[agent.Hostname] = instance
+    print(instance)
     return crud.create_agent(db=db, agent=agent)
+
 
 @app.delete("/agents/delete/{field}") 
 def delete_agent(field:models.ModelField,value, db:Session=Depends(get_db)):
+    #instances.pop(field.Hostname)
+    print(instances)
     return crud.delete_agent(db=db, field=field.name,value=value)
-
 
     
 # Endpoint de los features
@@ -88,3 +112,38 @@ async def read_agents(host:str):
     community='public'
     salida = await interfaceTable(community,host)
     return salida
+
+@app.post("/history/add/")
+def add_history(record: schemas.addHistory, db:Session=Depends(get_db)):
+    return crud.add_history(db=db, record=record)
+
+
+@app.post("/history/all/",response_model=list[schemas.readHistory])
+def add_history(db:Session=Depends(get_db)):
+    return crud.get_all_history (db=db)
+
+@app.post("/history/sensor/",response_model=schemas.responseHistory)
+def read_history_sensor(filter: schemas.getHistory, db:Session=Depends(get_db)):
+    return crud.get_history_sensor(db=db, filter=filter)
+
+
+@app.post("/exect-task/")
+async def create_instance(request: schemas.Manageable):
+    instance = instances.get(request.name)
+    if not instance:
+        raise HTTPException(status_code=404, detail="Instance not found")
+    await instance.saludar()
+    #await instance.Networktraffic('12', 10, request.nametask)
+    return {"result": 'Instancia creada'}
+
+
+@app.post("/task/stop/")
+async def stop_instance(request:schemas.stoptask):
+    instance = instances.get(request.name)
+    if not instance:
+        raise HTTPException(status_code=404, detail="Instance not found")
+    
+    instance.cancelar_tarea(request.nametask)
+    await instance.Iniciar()
+    return {"result": 'tarea cancelada'}
+

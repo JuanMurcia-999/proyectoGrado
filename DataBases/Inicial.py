@@ -4,13 +4,16 @@ import asyncio
 # Añade el directorio raíz al sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-
+from pysnmp.proto import rfc1902
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from pysnmp.smi.rfc1902 import ObjectIdentity, ObjectType
 from slim.slim_get import slim_get
+from slim.slim_bulk import get_bulk
 import models
 import asyncio
+from datetime import datetime
+
 
 
 # Configuración de la base de datos
@@ -37,53 +40,67 @@ async def Totalagentes():
                 #Recuperar las features por cada intervalo
                 features = db.query(models.Managed_features.oid).filter(models.Managed_features.timer == f'{inter.timer}', models.Managed_features.ip_agent == f'{agent.IP_address}').all()
                 OIDS.append( [item for (item,) in features])
-                
-                #pasar los valores por agente a la funcion que crea los agentes
             allelements.append(
                  {
-                      "IP":f"{agent.IP_address}",
+                      "IP":IPS,
                       "TIMES": TIMES,
                       "OIDS":OIDS
                  }
             )
-        await CreatorTask(allelements)
+        #pasar los valores por agente a la funcion que crea los agentes   
+        #print(allelements) 
+        #await CreatorTask(allelements)
     finally:
         db.close()
 
 async def Get_SNMP(**task):
-        varbinds = await slim_get(
-        'public', '192.168.20.25', 161,
-        ObjectType(ObjectIdentity('1.3.6.1.2.1.2.1.0'))
-    )
-        
-        _, num_registers = varbinds[0]
-        print(num_registers)
-
+    while True:    
         await asyncio.sleep(task['TIME'])
-        print(f"TIMER : {task['TIME']} , ATRIBUTOS: {task['OIDS']}")
+        varBinds = await get_bulk(
+            'public',*task['IP'] , 161,
+            0, 1,  # nonRepeaters, maxRepetitions
+           *task['OIDS']
+        )
+        
+        #for varBindRow in varBindTable:
+        for varBind in varBinds:
+            oid, value = varBind[0]
+            print(f"{task['TIME']}::::{oid}::: {value.prettyPrint()}::: {task['IP'][0]}")
+
+            db_history= models.History_features  (
+            ip_agent=str(task['IP'][0]),
+            oid=str(oid),
+            value=str(value)
+            )
+
+            db.add(db_history)
+            db.commit()
+            db.refresh(db_history)
     
 async def create_object_types(OIDS):
     return [ObjectType(ObjectIdentity(f'{oid}')) for oid in OIDS]
 
 async def CreatorTask(elements):
-    print('Iniciador de tareas')
     tasks=[]
     for agent in elements:
-        for time,OIDS in zip(agent['TIMES'],agent['OIDS']):
+        for TIME,OIDS in zip(agent['TIMES'],agent['OIDS']):
             oid = await create_object_types(OIDS)
-            tasks.append(asyncio.create_task(Get_SNMP(TIME=time,OIDS=OIDS)))
+            tasks.append(asyncio.create_task(Get_SNMP(TIME=TIME,OIDS=oid,IP=agent['IP'])))
     await asyncio.gather(*tasks)
    
 
 
 
+async def pruebas():
+    response = db.query(models.History_features.value,models.History_features.created_at).filter(models.History_features.oid == '1.3.6.1.2.1.2.2.1.10.12'  ,models.History_features.ip_agent == '192.168.20.25')
+    values = [item[0] for item in response]
+    date =  [item[1].strftime('%Y-%m-%d %H:%M:%S')    for item in response]
+
+    #print(values)
+    #print(type(date[0]))
+
 async def Inicial():
+    await pruebas()
     await Totalagentes()
 
-asyncio.run(Inicial())
-
-
-
-
-
-
+#asyncio.run(Inicial())

@@ -17,11 +17,11 @@ from pysmi.parser import NullParser
 from pysmi.codegen import NullCodeGen
 from pysmi.compiler import MibCompiler
 
-inputMibs = ['BORROWED-MIB']
+inputMibs = ['IF-MIB']
 
-httpBorrowers = [('C:\Users\User\Desktop\Proyecto de grado\snmp-mibs' )]
 
-dstDirectory = '.pysnmp-mibs'
+
+dstDirectory = 'C:/Users/Juan Murcia/Desktop/Proyecto de grado/mibs'
 
 # Initialize compiler infrastructure
 
@@ -33,7 +33,7 @@ mibCompiler = MibCompiler(
 mibCompiler.addSearchers(PyFileSearcher(dstDirectory))
 
 # search for precompiled MIBs at Web sites
-mibCompiler.addBorrowers( *[PyFileBorrower(HttpReader(*x)) for x in httpBorrowers])
+#mibCompiler.addBorrowers( *[PyFileBorrower(HttpReader(*x)) for x in httpBorrowers])
 
 # run MIB compilation
 results = mibCompiler.compile(*inputMibs)

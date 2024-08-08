@@ -5,7 +5,7 @@ async def run():
     errorIndication, errorStatus, errorIndex, varBinds = await sendNotification(
         SnmpEngine(),
         CommunityData('public'),
-        UdpTransportTarget(('192.168.20.22', 162)),
+        UdpTransportTarget(('192.168.20.25', 162)),
         ContextData(),
         'trap',
         NotificationType(ObjectIdentity('IF-MIB', 'linkDown'))

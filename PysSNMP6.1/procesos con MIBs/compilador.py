@@ -26,9 +26,9 @@ from pysmi.parser import SmiStarParser
 from pysmi.codegen import PySnmpCodeGen
 from pysmi.compiler import MibCompiler
 
-inputMibs = ["UDP-MIB"]
-srcDirectories = ["C:/Users/User/Desktop/Proyecto de grado/mibs"]
-dstDirectory = "C:/Users/User/Desktop/Proyecto de grado/Librerias/PySNMP6.1/mibs-compiler/"
+inputMibs = ["NET-SNMP-MIB"]
+srcDirectories = ["C:/Users/Juan Murcia/Desktop/Proyecto de grado/mibs"]
+dstDirectory = "C:/Users/Juan Murcia/Desktop/Proyecto de grado/Desarrollo/Recolector/mibs-compiler"
 
 # Initialize compiler infrastructure
 

@@ -8,8 +8,10 @@ def get_all_agent(db:Session):
 
 #Query para creacion de Agents
 def create_agent(db:Session, agent: schemas.CreateAgent):
-    db_agent= models.Agents(Hostname= agent.Hostname,
-                            IP_address =agent.IP_address)
+    db_agent= models.Agents(
+        Hostname= agent.Hostname,
+        IP_address =agent.IP_address,
+        ag_type=agent.ag_type )
     db.add(db_agent)
     db.commit()
     db.refresh(db_agent)
@@ -47,10 +49,6 @@ def new_feature(db:Session, feature: schemas.new_features):
     db.refresh(db_agent)
     return db_agent
 
-
-
-
-
 #Query para eleiminacion de features
 def delete_feature(db: Session,field,value):
     db_agent = db.query(models.Managed_features).filter( getattr(models.Managed_features,field) == value).first()
@@ -60,3 +58,31 @@ def delete_feature(db: Session,field,value):
         return "feature eliminada"
     return "Esta feature ya fue eliminado o no existe"
 
+# Agregar un nuevo registro al historial
+def add_history(db:Session, record: schemas.addHistory):
+
+    db_history= models.History_features  (
+        #id_his_feature=record.id_his_feature,
+        ip_agent=record.ip_agent,
+        oid=record.oid,
+        value=record.value
+        )
+
+    db.add(db_history)
+    db.commit()
+    db.refresh(db_history)
+    return db_history
+
+def get_all_history(db:Session):
+    return db.query(models.History_features).all()
+
+def get_history_sensor(db:Session,filter:schemas.getHistory):
+    
+    response = db.query(models.History_features.value,models.History_features.created_at).filter(models.History_features.oid == filter.oid  ,models.History_features.ip_agent == filter.ip_agent)
+    values = [item[0] for item in response]
+    date =  [item[1].strftime('%Y-%m-%d %H:%M:%S')    for item in response]
+
+    return {
+        'value': values,
+        'created_at': date
+    }
