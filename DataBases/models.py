@@ -52,6 +52,7 @@ class Administered_features(Base):
 
     agent = relationship('Agents', back_populates='features')
 
+
 class Default_features(Base):
     __tablename__ = 'default_features'
 

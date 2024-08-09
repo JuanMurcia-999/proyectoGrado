@@ -4,6 +4,14 @@ from datetime import datetime, date, time
 #esquema de datos para los elementos de la tabla Agents
 
 
+class TypeBase(BaseModel):
+    id_type: int
+    type_name: str
+
+    class Config:
+        orm_mode = True
+
+
 #Escritura
 class CreateAgent(BaseModel):
     ag_name:str
@@ -13,6 +21,24 @@ class CreateAgent(BaseModel):
 #Lectura
 class Agent(CreateAgent):
     id_agent:int
+    
+    class Config:
+        orm_mode = True
+
+
+
+class AgentWithType(Agent):
+    type: TypeBase  # Incluye la información del tipo
+
+    class Config:
+        orm_mode = True
+
+
+
+
+
+
+
 
 
 # Lectura de features
@@ -22,8 +48,24 @@ class new_features(BaseModel):
     adminis_name:str
     timer : int
 
+    class config:
+        orm_mode=True 
+
+
 class Features(new_features):
     id_adminis:int
+
+    class config:
+        orm_mode=True 
+
+class FeatureswithAgent(Features):
+    agent: Agent
+
+    class Config:
+        orm_mode = True
+
+
+
 
 
 
