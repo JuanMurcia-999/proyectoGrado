@@ -1,11 +1,11 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import or_,and_
 import models,schemas
 
 
 # Peticion que retorna todos los agentes en la base de datos
 def get_all_agent(db:Session):
-    return db.query(models.Agents).all()
+    return db.query(models.Agents).options(joinedload(models.Agents.type)).all()
 
 #Query para creacion de Agents
 def create_agent(db:Session, agent: schemas.CreateAgent):
@@ -30,11 +30,14 @@ def delete_agent(db: Session, field,value):
 
 # Query para obtener todas las caracteristicas que son monitoreadas
 def get_all_features(db: Session):
-    return db.query(models.Administered_features).all()
+    return db.query(models.Administered_features).options(joinedload(models.Administered_features.agent)).all()
 
 # Query para obtener todas las caracteristicas segun agente
 def get_all_features_agent(db: Session,value):
-    return db.query(models.Administered_features).filter( models.Administered_features.id_agent == value)
+    return db.query(models.Administered_features).filter( 
+        models.Administered_features.id_agent ==value).options(
+            joinedload(models.Administered_features.agent)
+        )
 
 # Agregar una nueva feature a monitorizar
 def new_feature(db:Session, feature: schemas.new_features):
@@ -78,7 +81,10 @@ def get_all_history(db:Session):
     return db.query(models.History_features).all()
 
 def get_history_sensor(db:Session,filter:schemas.getHistory):
-    response = db.query(models.History_features.value,models.History_features.date).filter(models.History_features.id_adminis == filter.id_adminis  ,models.History_features.id_agent == filter.id_agent)
+    response = db.query(models.History_features.value,models.History_features.date).filter(
+        models.History_features.id_adminis == filter.id_adminis  ,models.History_features.id_agent == filter.id_agent).order_by(
+            models.History_features.id_register.desc()
+        )
     values = [item[0] for item in response]
     date =  [item[1].strftime('%Y-%m-%d')    for item in response]
     return {
@@ -105,3 +111,32 @@ def add_default_feature(db:Session, feature: schemas.addDefaultFeature):
 def get_all_default_features(db: Session,value):
     return db.query(models.Default_features).filter( or_( models.Default_features.id_type == value ,
                                                           models.Default_features.id_type == 1)).all()
+
+
+def get_active_default(db:Session,value):
+    return db.query(models.Active_default).all()
+
+def add_active_default(db:Session, dates:schemas.Addactivedefault):
+    print(dates['id_feature'])
+
+    addactive = models.Active_default(
+        id_feature = dates['id_feature'],
+        id_agent = dates['id_agent']
+    )
+
+    db.add(addactive)
+    db.commit()
+    db.refresh(addactive)
+    return addactive
+
+def delete_active_default(db:Session, dates:schemas.Addactivedefault):
+    print(dates['id_feature'])
+    db_active = db.query(models.Active_default).filter( and_(models.Active_default.id_feature == dates['id_feature'],models.Active_default.id_agent == dates['id_agent'] ) ).first()
+   
+    print(f'{db_active.id_active} ::::: {db_active.id_feature} ::::::: {db_active.id_agent}')
+
+    if db_active:
+         db.delete(db_active)
+         db.commit()
+         return "tarea eliminada"
+    return "Esta tarea ya fue cancelada o no es posible"

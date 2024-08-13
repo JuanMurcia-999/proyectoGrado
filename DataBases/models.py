@@ -13,9 +13,9 @@ class ModelField(str, Enum):
     ip_address = "IP"
 
 class ModelFieldSensor(str, Enum):
-    id_agent = "ID agente"
+    id_agent = "id_agente"
     oid = "oid"
-    id_adminis = "ID feature"
+    id_adminis = "id_adminis"
 
 
 
@@ -51,7 +51,7 @@ class Administered_features(Base):
     timer = Column(Integer, nullable=False)
 
     agent = relationship('Agents', back_populates='features')
-
+    
 
 class Default_features(Base):
     __tablename__ = 'default_features'
@@ -61,7 +61,6 @@ class Default_features(Base):
     id_type = Column(Integer, ForeignKey('types.id_type'), nullable=False)
 
     type = relationship('Types', back_populates='defaultfeatures')
-
 
 class Active_default(Base):
 
@@ -86,3 +85,4 @@ class History_features(Base):
 
     agent = relationship('Agents')
     administered_feature = relationship('Administered_features')
+

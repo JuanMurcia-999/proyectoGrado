@@ -49,13 +49,45 @@ class AnchoBanda:
 
 
 class Memorysize:
-    def __init__(self, host:str,intervalo:int) -> None:
-        self.host=host
-        self.intervalo=intervalo
+    def __init__(self, ip:str,timer:int) -> None:
+        self.ip=ip
+        self.timer=timer
     
     async def run(self):
         await slim_get(
-        'public',self.host, 161,
+        'public',self.ip, 161,
         ObjectType(ObjectIdentity('1.3.6.1.2.1.25.2.2.0')),
     )
         
+
+
+class Processes:
+    def __init__(self, ip:str,timer:int) -> None:
+        self.ip=ip
+        self.timer=timer|10
+    
+    async def TaskNumProcesses(self):
+        while True:
+            
+            varbinds = await slim_get(
+            'public', self.ip, 161,
+            ObjectType(ObjectIdentity('1.3.6.1.2.1.25.1.6.0'))
+        )
+            _, num_processes = varbinds[0]
+            num_processes=int(num_processes)
+
+            print(f'Numero de procesos {num_processes}')    
+            await asyncio.sleep(self.timer)
+    
+
+    async def TaskMemorySize(self):
+        while True:
+            varbinds= await slim_get(
+                'public',self.ip, 161,
+                ObjectType(ObjectIdentity('1.3.6.1.2.1.25.2.2.0')),)
+
+            _, MemorySize = varbinds[0]
+            MemorySize=int(MemorySize)
+
+            print(f'Memoria total {MemorySize}')    
+            await asyncio.sleep(self.timer)

@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Dict, Any
 from datetime import datetime, date, time
 
 #esquema de datos para los elementos de la tabla Agents
@@ -26,7 +27,7 @@ class Agent(CreateAgent):
         orm_mode = True
 
 
-
+# lectura de angesntes con Types
 class AgentWithType(Agent):
     type: TypeBase  # Incluye la información del tipo
 
@@ -38,10 +39,7 @@ class AgentWithType(Agent):
 
 
 
-
-
-
-# Lectura de features
+#features
 class new_features(BaseModel):
     id_agent :int
     oid: str
@@ -58,6 +56,7 @@ class Features(new_features):
     class config:
         orm_mode=True 
 
+#lectura de features con agentes
 class FeatureswithAgent(Features):
     agent: Agent
 
@@ -68,8 +67,8 @@ class FeatureswithAgent(Features):
 
 
 
-
 class iftable(BaseModel):
+        ifIndex:int
         ifDescr:str    
         ifType:int           
         ifMtu:int    
@@ -110,6 +109,16 @@ class readHistory(addHistory):
     time:time
 
 
+class HistoryWithFeature():
+    pass
+
+
+
+
+
+
+
+
 class getHistory(BaseModel):
     id_agent:int
     id_adminis:int
@@ -122,18 +131,41 @@ class responseHistory(BaseModel):
 
 #/////////////Modelos de los gestionables establecidos//////////////
 
-class addDefaultFeature(BaseModel):
-    fe_name:str
-    id_type:int
 
-
-
+    
 class stoptask(BaseModel):
     name:str
     nametask:str
 
     
 class Manageable(stoptask):
-    ip:str
-  
+    params: Dict[str, Any]
 
+
+class addDefaultFeature(BaseModel):
+    id_feature:int
+    fe_name:str
+    id_type:int
+
+
+class Addactivedefault(BaseModel):
+    id_feature:int
+    id_agent:int
+
+    class config:
+      orm_mode = True
+
+class ReadAddactivedefault(Addactivedefault):
+    id_active:int
+
+    class config:
+        orm_mode = True
+
+
+
+
+#--------------------------- pruebas
+
+class ReadDefaultFeature(BaseModel):
+    id_feature:int
+    fe_name:str

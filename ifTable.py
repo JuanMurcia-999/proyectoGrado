@@ -16,7 +16,7 @@ async def interfaceTable(community,host):
     #host='192.168.20.25'
     port=161
     OID_IFTABLE='1.3.6.1.2.1.2.2.1'
-    indices = list(range(2, 23)) 
+    indices = list(range(1, 23)) 
     temp=[]
     
     iftable=[]
@@ -43,29 +43,30 @@ async def interfaceTable(community,host):
             temp.append(value)
             
     
-    for i in range(0, len(temp), 21):
+    for i in range(0, len(temp), 22):
         iftable.append( {
-        'ifDescr':str(temp[i]).replace('\x00', '').replace('\u0000', ''),                  
-        'ifType':int(temp[i+1]),                  
-        'ifMtu':int(temp[i+2]),         
-        'ifSpeed':int(temp[i+3]), 
-        'ifPhysAddress':'-'.join(f'{byte:02X}' for byte in temp[i+4]),
-        'ifAdminStatus':int(temp[i+5]),          
-        'ifOperStatus':int(temp[i+6]),         
-        'ifLastChange':int(temp[i+7]),          
-        'ifInOctets':int(temp[i+8]),          
-        'ifInUcastPkts':int(temp[i+9]),          
-        'ifInNUcastPkts':int(temp[i+10]),         
-        'ifInDiscards':int(temp[i+11]),
-        'ifInErrors':int(temp[i+12]),         
-        'ifInUnknownProtos':int(temp[i+13]),
-        'ifOutOctets':int(temp[i+14]),         
-        'ifOutUcastPkts':int(temp[i+15]),        
-        'ifOutNUcastPkts':int(temp[i+16]),
-        'ifOutDiscards':int(temp[i+17]),         
-        'ifOutErrors':int(temp[i+18]),         
-        'ifOutQLen':int(temp[i+19]),  
-        'ifSpecific':float(str(temp[i+20])),    
+        'ifIndex':int(temp[i]), 
+        'ifDescr':str(temp[i+1]).replace('\x00', '').replace('\u0000', ''),                  
+        'ifType':int(temp[i+2]),                  
+        'ifMtu':int(temp[i+3]),         
+        'ifSpeed':int(temp[i+4]), 
+        'ifPhysAddress':'-'.join(f'{byte:02X}' for byte in temp[i+5]),
+        'ifAdminStatus':int(temp[i+6]),          
+        'ifOperStatus':int(temp[i+7]),         
+        'ifLastChange':int(temp[i+8]),          
+        'ifInOctets':int(temp[i+9]),          
+        'ifInUcastPkts':int(temp[i+10]),          
+        'ifInNUcastPkts':int(temp[i+11]),         
+        'ifInDiscards':int(temp[i+12]),
+        'ifInErrors':int(temp[i+13]),         
+        'ifInUnknownProtos':int(temp[i+14]),
+        'ifOutOctets':int(temp[i+15]),         
+        'ifOutUcastPkts':int(temp[i+16]),        
+        'ifOutNUcastPkts':int(temp[i+17]),
+        'ifOutDiscards':int(temp[i+18]),         
+        'ifOutErrors':int(temp[i+19]),         
+        'ifOutQLen':int(temp[i+20]),  
+        'ifSpecific':float(str(temp[i+21])),    
         })
 
     
