@@ -46,16 +46,41 @@ class AnchoBanda:
 
             print(f'Kbps IN: {in_kbps} /// Kbps OUT {out_kbps}')
 
+class Processes:
+    def __init__(self, ip:str,timer:int) -> None:
+        self.ip=ip
+        self.timer=timer|10
+        self.stop_flag = asyncio.Event()
+
+    async def TaskNumProcesses(self):
+        while not self.stop_flag.is_set():
+            try:
+                varbinds = await slim_get(
+                'public', self.ip, 161,
+                ObjectType(ObjectIdentity('1.3.6.1.2.1.25.1.6.0'))
+            )
+                _, num_processes = varbinds[0]
+                num_processes=int(num_processes)
+
+                print(f'Numero de procesos {num_processes}')
+                await asyncio.sleep(self.timer)
+            except asyncio.CancelledError:
+                print(f'Task was cancelled')
+                break
 
 
-class Memorysize:
-    def __init__(self, host:str,intervalo:int) -> None:
-        self.host=host
-        self.intervalo=intervalo
-    
-    async def run(self):
-        await slim_get(
-        'public',self.host, 161,
-        ObjectType(ObjectIdentity('1.3.6.1.2.1.25.2.2.0')),
-    )
-        
+    async def TaskMemorySize(self):
+        while True:
+            try:
+                varbinds= await slim_get(
+                    'public',self.ip, 161,
+                    ObjectType(ObjectIdentity('1.3.6.1.2.1.25.2.2.0')),)
+
+                _, MemorySize = varbinds[0]
+                MemorySize=int(MemorySize)
+
+                print(f'Memoria total {MemorySize}')
+                await asyncio.sleep(self.timer)
+            except asyncio.CancelledError:
+                print(f'Task was cancelled')
+                break

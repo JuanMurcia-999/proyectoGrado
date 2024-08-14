@@ -1,34 +1,74 @@
 from pydantic import BaseModel
-from datetime import datetime
+from typing import Dict, Any
+from datetime import datetime, date, time
 
 #esquema de datos para los elementos de la tabla Agents
 
 
+class TypeBase(BaseModel):
+    id_type: int
+    type_name: str
+
+    class Config:
+        orm_mode = True
+
+
 #Escritura
 class CreateAgent(BaseModel):
-    Hostname:str
-    IP_address:str
-    ag_type:str
+    ag_name:str
+    ip_address:str
+    ag_type:int
 
 #Lectura
 class Agent(CreateAgent):
-    ID_agent:int
+    id_agent:int
+    
+    class Config:
+        orm_mode = True
 
 
-# Lectura de features
+# lectura de angesntes con Types
+class AgentWithType(Agent):
+    type: TypeBase  # Incluye la información del tipo
+
+    class Config:
+        orm_mode = True
+
+
+
+
+
+
+#features
 class new_features(BaseModel):
     id_agent :int
-    ip_agent:str
     oid: str
-    description:str
+    adminis_name:str
     timer : int
 
+    class config:
+        orm_mode=True 
+
+
 class Features(new_features):
-    id_feature:int
+    id_adminis:int
+
+    class config:
+        orm_mode=True 
+
+#lectura de features con agentes
+class FeatureswithAgent(Features):
+    agent: Agent
+
+    class Config:
+        orm_mode = True
+
+
 
 
 
 class iftable(BaseModel):
+        ifIndex:int
         ifDescr:str    
         ifType:int           
         ifMtu:int    
@@ -57,23 +97,32 @@ class SensorCreate(BaseModel):
     description:str
     interval: str
 
-class SensorRead():
-    pass
-
 
 class addHistory(BaseModel):
-    ip_agent:str
-    oid:str
+    id_agent:int
+    id_adminis:int
     value:str
 
 class readHistory(addHistory):
-    id_his_feature:int
-    created_at:datetime
+    id_register:int
+    date:date
+    time:time
+
+
+class HistoryWithFeature():
+    pass
+
+
+
+
+
+
 
 
 class getHistory(BaseModel):
-    ip_agent:str
-    oid:str
+    id_agent:int
+    id_adminis:int
+
 
 class responseHistory(BaseModel):
     value:list[str]
@@ -82,16 +131,41 @@ class responseHistory(BaseModel):
 
 #/////////////Modelos de los gestionables establecidos//////////////
 
-class addDefaultFeature(BaseModel):
-    fe_name:str
-    ag_type: str
 
+    
 class stoptask(BaseModel):
     name:str
     nametask:str
 
     
 class Manageable(stoptask):
-    ip:str
-  
+    params: Dict[str, Any]
 
+
+class addDefaultFeature(BaseModel):
+    id_feature:int
+    fe_name:str
+    id_type:int
+
+
+class Addactivedefault(BaseModel):
+    id_feature:int
+    id_agent:int
+
+    class config:
+      orm_mode = True
+
+class ReadAddactivedefault(Addactivedefault):
+    id_active:int
+
+    class config:
+        orm_mode = True
+
+
+
+
+#--------------------------- pruebas
+
+class ReadDefaultFeature(BaseModel):
+    id_feature:int
+    fe_name:str
