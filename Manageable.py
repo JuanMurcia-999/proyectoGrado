@@ -44,9 +44,10 @@ class ManageablePC(ManageableGeneral):
             )
             if self.tasks is not None:
                 self.tasks[task_id] = task
+            print(self.tasks)
         except Exception as e:
               print(f'Error en la descripción: {e}')
-
+ 
     async def MemorySize(self, timer, task_id):
         try:
             task = asyncio.create_task(
@@ -54,6 +55,7 @@ class ManageablePC(ManageableGeneral):
             )
             if self.tasks is not None:
                 self.tasks[task_id] = task
+            print(self.tasks)
         except Exception as e:
               print(f'Error en la descripción: {e}')
 
@@ -66,13 +68,14 @@ class ManageablePC(ManageableGeneral):
             print(self.tasks)
             await asyncio.gather(*self.tasks.values())
 
-    def cancelar_tarea(self, task_id: str):
+    async def cancelar_tarea(self, task_id: str):
         # Cancelar una tarea específica por su identificador
         if task_id in self.tasks:
             task = self.tasks.pop(task_id)
             task.cancel()
             # Esperar a que la tarea sea cancelada
-            asyncio.create_task(self._esperar_cancelacion(task))
+            await self._esperar_cancelacion(task)
+        print(self.tasks)
 
     async def _esperar_cancelacion(self, task):
         try:

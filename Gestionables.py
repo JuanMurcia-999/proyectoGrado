@@ -46,48 +46,41 @@ class AnchoBanda:
 
             print(f'Kbps IN: {in_kbps} /// Kbps OUT {out_kbps}')
 
-
-
-class Memorysize:
-    def __init__(self, ip:str,timer:int) -> None:
-        self.ip=ip
-        self.timer=timer
-    
-    async def run(self):
-        await slim_get(
-        'public',self.ip, 161,
-        ObjectType(ObjectIdentity('1.3.6.1.2.1.25.2.2.0')),
-    )
-        
-
-
 class Processes:
     def __init__(self, ip:str,timer:int) -> None:
         self.ip=ip
         self.timer=timer|10
-    
-    async def TaskNumProcesses(self):
-        while True:
-            
-            varbinds = await slim_get(
-            'public', self.ip, 161,
-            ObjectType(ObjectIdentity('1.3.6.1.2.1.25.1.6.0'))
-        )
-            _, num_processes = varbinds[0]
-            num_processes=int(num_processes)
+        self.stop_flag = asyncio.Event()
 
-            print(f'Numero de procesos {num_processes}')    
-            await asyncio.sleep(self.timer)
-    
+    async def TaskNumProcesses(self):
+        while not self.stop_flag.is_set():
+            try:
+                varbinds = await slim_get(
+                'public', self.ip, 161,
+                ObjectType(ObjectIdentity('1.3.6.1.2.1.25.1.6.0'))
+            )
+                _, num_processes = varbinds[0]
+                num_processes=int(num_processes)
+
+                print(f'Numero de procesos {num_processes}')
+                await asyncio.sleep(self.timer)
+            except asyncio.CancelledError:
+                print(f'Task was cancelled')
+                break
+
 
     async def TaskMemorySize(self):
         while True:
-            varbinds= await slim_get(
-                'public',self.ip, 161,
-                ObjectType(ObjectIdentity('1.3.6.1.2.1.25.2.2.0')),)
+            try:
+                varbinds= await slim_get(
+                    'public',self.ip, 161,
+                    ObjectType(ObjectIdentity('1.3.6.1.2.1.25.2.2.0')),)
 
-            _, MemorySize = varbinds[0]
-            MemorySize=int(MemorySize)
+                _, MemorySize = varbinds[0]
+                MemorySize=int(MemorySize)
 
-            print(f'Memoria total {MemorySize}')    
-            await asyncio.sleep(self.timer)
+                print(f'Memoria total {MemorySize}')
+                await asyncio.sleep(self.timer)
+            except asyncio.CancelledError:
+                print(f'Task was cancelled')
+                break

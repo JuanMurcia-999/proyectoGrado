@@ -130,10 +130,9 @@ def add_active_default(db:Session, dates:schemas.Addactivedefault):
     return addactive
 
 def delete_active_default(db:Session, dates:schemas.Addactivedefault):
-    print(dates['id_feature'])
     db_active = db.query(models.Active_default).filter( and_(models.Active_default.id_feature == dates['id_feature'],models.Active_default.id_agent == dates['id_agent'] ) ).first()
    
-    print(f'{db_active.id_active} ::::: {db_active.id_feature} ::::::: {db_active.id_agent}')
+    #print(f'{db_active.id_active} ::::: {db_active.id_feature} ::::::: {db_active.id_agent}')
 
     if db_active:
          db.delete(db_active)

@@ -133,15 +133,6 @@ async def read_agents(host:str):
 
 
 #--------------------------------------------------------------------------------HISTORIAL
-#Agrega infromacion al historial(Temporal)
-@app.post("/history/add/")
-def add_history(record: schemas.addHistory, db:Session=Depends(get_db)):
-    return crud.add_history(db=db, record=record)
-
-#Recuepara todo el historial de todos los sensores (Temporal)
-@app.post("/history/all/",response_model=list[schemas.readHistory])
-def add_history(db:Session=Depends(get_db)):
-    return crud.get_all_history (db=db)
 
 #Obtener el historial segun el sensor (OID)
 @app.post("/history/sensor/",response_model=schemas.responseHistory)
@@ -151,17 +142,6 @@ def read_history_sensor(filter: schemas.getHistory, db:Session=Depends(get_db)):
 
 
 #-----------------------------------------------------------------------------------GESTIONABLES
-
-#crear nuevo gestionable (TEMPORAL)
-@app.post("/features/deafult/new/",response_model=schemas.addDefaultFeature)
-def new_feature(feature: schemas.addDefaultFeature, db:Session=Depends(get_db)):
-    return crud.add_default_feature(db=db, feature=feature)
-
-
-# Obtener los default segun el tipo de agente
-# @app.get("/features/default/agent/",response_model=list[schemas.addDefaultFeature]) 
-# def get_deafult_feature_agent(value:str, db:Session=Depends(get_db)):
-#     return crud.get_all_default_features(db=db,value=value)
 
 
 @app.get("/features/default/agent/",response_model=list[schemas.ReadDefaultFeature]) 
@@ -180,12 +160,6 @@ def get_deafult_feature_agent(id:int,type:int, db:Session=Depends(get_db)):
      return tareas
 
 
-
-
-# # Obtener el listado de las tareas default activas 
-# @app.get("/feature/default/active/", response_model=list[schemas.ReadAddactivedefault])
-# def get_active_default(value:str , db:Session=Depends(get_db)):
-#     return crud.get_active_default(db=db, value=value)
 
 @app.get("/feature/default/active/",response_model=list[schemas.ReadDefaultFeature]) 
 def get_deafult_feature_agent(id:int,type:int, db:Session=Depends(get_db)):
@@ -225,7 +199,6 @@ async def create_instance(request: schemas.Manageable, db:Session=Depends(get_db
     state = crud.add_active_default(db=db, dates=request.params)    
     return {"result": 'Instancia creada'}
 
-
 #Deteenr una de las atreas por defautl
 @app.post("/task/stop/")
 async def stop_instance(request:schemas.Manageable,db:Session=Depends(get_db)):
@@ -234,7 +207,7 @@ async def stop_instance(request:schemas.Manageable,db:Session=Depends(get_db)):
     if not instance:
         raise HTTPException(status_code=404, detail="Instance not found")
     state = crud.delete_active_default(db=db, dates=request.params)
-    instance.cancelar_tarea( request.params['task'])
+    await instance.cancelar_tarea( request.params['task'])
     await instance.Iniciar()
     
     
@@ -243,37 +216,7 @@ async def stop_instance(request:schemas.Manageable,db:Session=Depends(get_db)):
 
 
 #---------------------------------------------------------------------------------PRUEBAS
-
-
-@app.get("/activas/",response_model=list[schemas.ReadDefaultFeature]) 
-def get_deafult_feature_agent(value:int, db:Session=Depends(get_db)):
-     
-     tareas= db.query(models.Default_features.fe_name,models.Default_features.id_feature).join(
-         models.Active_default,
-          models.Default_features.id_feature == models.Active_default.id_feature).filter(
-                and_(
-                    models.Active_default.id_agent == value,
-                    models.Default_features.id_type.in_([1,2])
-                ))
-     return tareas
-
-@app.get("/Disponibles/",response_model=list[schemas.ReadDefaultFeature]) 
-def get_deafult_feature_agent(value:int, db:Session=Depends(get_db)):
-     
-     tareas= db.query(models.Default_features.fe_name,models.Default_features.id_feature).outerjoin(
-         models.Active_default,
-         and_(
-          models.Default_features.id_feature == models.Active_default.id_feature,
-          models.Active_default.id_agent ==  value
-          )).filter(
-                and_(
-                    models.Active_default.id_feature.is_(None) ,
-                    models.Default_features.id_type.in_([1,2])
-                ))
-     return tareas
-
-
-
+    
 
 
 @app.post("/pruebassssssss/")
