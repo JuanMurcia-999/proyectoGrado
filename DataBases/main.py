@@ -18,12 +18,14 @@ from database import SessionLocal,engine
 from Inicial import Inicial
 from Manageable import ManageablePC, ManageableRT
 from typing import List
+import json
+
 
 models.Base.metadata.create_all(bind=engine)  # crea la base de datos si no existe
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    create_instance_startup()
+    await create_instance_startup()
     asyncio.create_task(Inicial())
     yield
 
@@ -42,21 +44,54 @@ def get_db():
     finally:
         db.close()
 
-def create_instance_startup():
+async def create_instance_startup():
     agents = crud.get_all_agent(db=SessionLocal())
     for agent in agents:
         instance=create_instance_from_Manageable(agent)
         instances[agent.ag_name] = instance
-        print(instance)
-    
-    
+        sensors =  SessionLocal().query(models.Active_default).options(joinedload(models.Active_default.features)).filter(models.Active_default.id_agent == agent.id_agent).all()
+        for sensor in sensors:
+            params = json.loads(sensor.params)
+            await activator_tasks(name=agent.ag_name, nametask=sensor.features.fe_name, params=params)
+           
 
 
 def create_instance_from_Manageable(request: schemas.Agent):
     if request.ag_type ==2:
-        return ManageablePC(request.ip_address, request.ag_name)
+        return ManageablePC(request.ip_address, request.ag_name, request.id_agent)
     elif request.ag_type == 3:
-        return ManageableRT(request.ip_address, request.ag_name)
+        return ManageableRT(request.ip_address, request.ag_name,request.id_agent)
+
+
+
+async def activator_tasks(name:str, nametask:str, params):
+    instance = instances.get(name)
+    if not instance:
+        raise HTTPException(status_code=404, detail="Instance not found")
+    
+    task_mapping = {
+        'saludar': instance.saludar,
+        'NumProccesses': instance.NumProccesses,
+        'MemorySize': instance.MemorySize
+    }
+
+    task_func = task_mapping.get(nametask)
+    if not task_func:
+        print(f"Tarea no encontrada: {nametask}")
+        raise HTTPException(status_code=400, detail="Tarea no encontrada")
+    try:
+        # Asumiendo que todas las tareas manejan parámetros similares
+        params = params
+        if nametask in ['NumProccesses', 'MemorySize']:
+            await task_func(params, nametask)
+            return True
+        else:
+            await task_func()
+    except Exception as e:
+        print(f"Error al ejecutar la tarea: {e}")
+        raise HTTPException(status_code=500, detail="Error interno del servidor")     
+
+
 
 
 app = FastAPI(lifespan=lifespan)
@@ -83,7 +118,6 @@ def read_agents(db: Session = Depends(get_db)):
 def create_agent(agent: schemas.CreateAgent, db:Session=Depends(get_db)):
     instance = create_instance_from_Manageable(agent)
     instances[agent.ag_name] = instance
-    print(instance)
     return crud.create_agent(db=db, agent=agent)
 
 # elimina agentes
@@ -181,47 +215,49 @@ def new_feature(feature: schemas.Addactivedefault, db:Session=Depends(get_db)):
     return crud.add_active_default(db=db, dates=feature)
 
 
-# Ejecutar una de las tareas por default 
+
 @app.post("/exect-task/")
 async def create_instance(request: schemas.Manageable, db:Session=Depends(get_db)):
     print(request)
-    instance = instances.get(request.name)
-    if not instance:
-        raise HTTPException(status_code=404, detail="Instance not found")
-    if request.nametask =='Networktraffic':
-         await instance.Networktraffic(str(request.params['inter']),request.params['timer'], request.params['task'])
-    elif request.nametask =='saludar':
-        await instance.saludar()
-    elif request.nametask == 'NumProccesses':
-        await instance.NumProccesses(request.params['timer']|10, request.params['task'])
-    elif request.nametask == 'MemorySize':
-        await instance.MemorySize(request.params['timer'], request.params['task'])
-    state = crud.add_active_default(db=db, dates=request.params)    
-    return {"result": 'Instancia creada'}
+    state =await activator_tasks(name=request.name,nametask=request.nametask,params=request.params)       
+    if state:
+        state = crud.add_active_default(db=db, dates=request)
+    else :
+        raise HTTPException(status_code=400, detail="Tarea no subida")
+
+
 
 #Deteenr una de las atreas por defautl
 @app.post("/task/stop/")
 async def stop_instance(request:schemas.Manageable,db:Session=Depends(get_db)):
-    print(request)
     instance = instances.get(request.name)
     if not instance:
         raise HTTPException(status_code=404, detail="Instance not found")
-    state = crud.delete_active_default(db=db, dates=request.params)
-    await instance.cancelar_tarea( request.params['task'])
+    state = crud.delete_active_default(db=db, dates=request)
+    await instance.cancelar_tarea( request.nametask)
     await instance.Iniciar()
-    
-    
-     
-    return {"result": 'tarea cancelada'}
-
+    return {"result": 'tarea cancelada'}            
 
 #---------------------------------------------------------------------------------PRUEBAS
     
-
-
-@app.post("/pruebassssssss/")
-async def stop_instance(request:schemas.Manageable,db:Session=Depends(get_db)):
-
-    state = crud.delete_active_default(db=db, dates=request.params)
      
-    return state
+
+@app.get("/tareas activas",response_model=list[schemas.ActiveWithFeature])
+async def read_actives(db:Session=Depends(get_db)):
+    return crud.get_active_default_prueba(db=db)
+
+
+@app.post("/pruebaaaasss/")
+async def stop_instance(request:schemas.Manageable,db:Session=Depends(get_db)):
+    instance = instances.get(request.name)
+    if not instance:
+        raise HTTPException(status_code=404, detail="Instance not found")
+    await instance.task_oid()
+
+
+@app.post("/pruebs/")
+async def stop_instance(request:schemas.Manageable,db:Session=Depends(get_db)):
+    instance = instances.get(request.name)
+    if not instance:
+        raise HTTPException(status_code=404, detail="Instance not found")
+    await instance.restarttask()

@@ -1,11 +1,12 @@
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import or_,and_
 import models,schemas
-
+import json
 
 # Peticion que retorna todos los agentes en la base de datos
 def get_all_agent(db:Session):
     return db.query(models.Agents).options(joinedload(models.Agents.type)).all()
+
 
 #Query para creacion de Agents
 def create_agent(db:Session, agent: schemas.CreateAgent):
@@ -116,12 +117,17 @@ def get_all_default_features(db: Session,value):
 def get_active_default(db:Session,value):
     return db.query(models.Active_default).all()
 
-def add_active_default(db:Session, dates:schemas.Addactivedefault):
-    print(dates['id_feature'])
+def get_active_default_prueba(db:Session):
+    return db.query(models.Active_default).options(joinedload(models.Active_default.features)).all()
 
+
+
+def add_active_default(db:Session, dates: schemas.Manageable):
+    params_json =json.dumps(dates.params)
     addactive = models.Active_default(
-        id_feature = dates['id_feature'],
-        id_agent = dates['id_agent']
+        id_feature = dates.id_feature,
+        id_agent = dates.id_agent,
+        params = params_json
     )
 
     db.add(addactive)
@@ -129,9 +135,8 @@ def add_active_default(db:Session, dates:schemas.Addactivedefault):
     db.refresh(addactive)
     return addactive
 
-def delete_active_default(db:Session, dates:schemas.Addactivedefault):
-    db_active = db.query(models.Active_default).filter( and_(models.Active_default.id_feature == dates['id_feature'],models.Active_default.id_agent == dates['id_agent'] ) ).first()
-   
+def delete_active_default(db:Session, dates:schemas.Manageable):
+    db_active = db.query(models.Active_default).filter( and_(models.Active_default.id_feature == dates.id_feature,models.Active_default.id_agent == dates.id_agent ) ).first()
     #print(f'{db_active.id_active} ::::: {db_active.id_feature} ::::::: {db_active.id_agent}')
 
     if db_active:

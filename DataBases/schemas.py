@@ -136,6 +136,8 @@ class responseHistory(BaseModel):
 class stoptask(BaseModel):
     name:str
     nametask:str
+    id_agent:int
+    id_feature:int
 
     
 class Manageable(stoptask):
@@ -146,6 +148,9 @@ class addDefaultFeature(BaseModel):
     id_feature:int
     fe_name:str
     id_type:int
+    class config:
+        orm_mode = True
+
 
 
 class Addactivedefault(BaseModel):
@@ -153,7 +158,8 @@ class Addactivedefault(BaseModel):
     id_agent:int
 
     class config:
-      orm_mode = True
+        orm_mode = True    
+
 
 class ReadAddactivedefault(Addactivedefault):
     id_active:int
@@ -161,7 +167,11 @@ class ReadAddactivedefault(Addactivedefault):
     class config:
         orm_mode = True
 
+class ActiveWithFeature(ReadAddactivedefault):
+    features: addDefaultFeature
 
+    class Config:
+        orm_mode=True
 
 
 #--------------------------- pruebas

@@ -2,8 +2,7 @@ import asyncio
 from Gestionables import AnchoBanda,Processes
 from slim.slim_get import slim_get
 from pysnmp.smi.rfc1902 import ObjectIdentity, ObjectType
-
-
+from DataBases.taskoid import sensorOID
 
 
 
@@ -30,17 +29,20 @@ class ManageableGeneral:
 
 class ManageablePC(ManageableGeneral):
 
-    def __init__(self, ip: str, name: str) -> None:
+    def __init__(self, ip: str, name: str,id:int) -> None:
         super().__init__(ip, name)
         self.tasks = {}
+        self.taskoid=[]
+        self.id= id
+        self.instanceoid = sensorOID
 
     async def saludar(self):
         print(f'estoy saludando con el equipo {self.name} que es PC')
 
-    async def NumProccesses(self, timer, task_id):
+    async def NumProccesses(self, params, task_id):
         try:
             task = asyncio.create_task(
-                Processes(ip=self.ip, timer=timer).TaskNumProcesses()
+                Processes(ip=self.ip, timer=params['timer']).TaskNumProcesses()
             )
             if self.tasks is not None:
                 self.tasks[task_id] = task
@@ -48,16 +50,23 @@ class ManageablePC(ManageableGeneral):
         except Exception as e:
               print(f'Error en la descripción: {e}')
  
-    async def MemorySize(self, timer, task_id):
+    async def MemorySize(self, params, task_id):
         try:
             task = asyncio.create_task(
-                Processes(ip=self.ip, timer=timer).TaskMemorySize()
+                Processes(ip=self.ip, timer=params['timer']).TaskMemorySize()
             )
             if self.tasks is not None:
                 self.tasks[task_id] = task
             print(self.tasks)
         except Exception as e:
               print(f'Error en la descripción: {e}')
+
+    async def restarttask(self):
+        await self.instanceoid.CreatorTask()
+
+    async def task_oid(self):
+         self.instanceoid = sensorOID(self.ip, self.id)
+         await self.instanceoid.CreatorTask()
 
 
 
@@ -88,9 +97,10 @@ class ManageablePC(ManageableGeneral):
 
 
 class ManageableRT(ManageableGeneral):
-    def __init__(self, ip: str, name: str) -> None:
+    def __init__(self, ip: str, name: str , id:int) -> None:
         super().__init__(ip, name)
         self.tasks = {}
+        self.id= id
     async def saludar(self):
         print(f'estoy saludando con el equipo {self.name} que es Router')
 

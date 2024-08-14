@@ -1,0 +1,111 @@
+import sys
+import os
+import asyncio
+
+# Añade el directorio raíz al sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from pysnmp.smi.rfc1902 import ObjectIdentity, ObjectType
+from slim.slim_get import slim_get
+from slim.slim_bulk import get_bulk
+import models
+
+# Configuración de la base de datos
+DATABASE_URL = "sqlite:///C:/Users/Juan Murcia/Desktop/Proyecto de grado/Desarrollo/Recolector/DataBases/productos.sqlite"
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+db = SessionLocal()
+
+async def Totalagentes(id_agent: int, ip_agent: str):
+    allelements = []
+    db = SessionLocal()  # Asegúrate de que cada tarea tenga su propia sesión
+
+    try:
+        TIMES = []
+        OIDS = []
+        IDF = []
+
+        intervalos = db.query(models.Administered_features.timer, models.Administered_features.id_adminis).filter(
+            models.Administered_features.id_agent == id_agent).distinct().all()
+
+        for inter in intervalos:
+            TIMES.append(inter.timer)
+            IDF.append(inter.id_adminis)
+            features = db.query(models.Administered_features.oid, models.Administered_features.id_adminis).filter(
+                models.Administered_features.timer == f'{inter.timer}',
+                models.Administered_features.id_agent == id_agent).all()
+
+            OIDS.append([item.oid for item in features])
+
+        allelements.append(
+            {
+                "ID": id_agent,
+                "IP": ip_agent,
+                "TIMES": TIMES,
+                "OIDS": OIDS,
+                "IDF": IDF
+            }
+        )
+        return allelements
+    finally:
+        db.close()
+
+async def Get_SNMP(**task):
+    while True:
+        await asyncio.sleep(task['TIME'])
+        varBinds = await get_bulk(
+            'public', task['IP'], 161,
+            0, 1,  # nonRepeaters, maxRepetitions
+            *task['OIDS']
+        )
+
+        for varBind in varBinds:
+            oid, value = varBind[0]
+            print(f"{task['TIME']}::::{oid}::: {value.prettyPrint()}::: {task['IP']}")
+
+            db = SessionLocal()  # Asegúrate de que cada tarea tenga su propia sesión
+            db_history = models.History_features(
+                id_agent=task['ID'],
+                id_adminis=task['IDF'],
+                value=str(value)
+            )
+
+            db.add(db_history)
+            db.commit()
+            db.refresh(db_history)
+            db.close()
+
+class sensorOID:
+    def __init__(self, ip: str, id: int) -> None:
+        self.ip = ip
+        self.id = id
+        self.tasks = []
+
+    async def CreatorTask(self):
+        for task in self.tasks:
+            task.cancel()
+        elements = await Totalagentes(self.id, self.ip)
+        for agent in elements:
+            for TIME, OIDS, IDF in zip(agent['TIMES'], agent['OIDS'], agent['IDF']):
+                oid = [ObjectType(ObjectIdentity(f'{oid}')) for oid in OIDS]
+                self.tasks.append(asyncio.create_task(Get_SNMP(TIME=TIME, OIDS=oid, ID=agent['ID'], IDF=IDF, IP=agent['IP'])))
+        print(self.tasks)
+        # Ejecuta todas las tareas concurrentemente
+        #await asyncio.gather(*self.tasks)
+
+
+
+
+# async def Inicial():
+#     Camilo = sensorOID('192.168.20.25', 2)
+#     Erika = sensorOID('192.168.20.37', 3)
+
+#     # Ejecuta las tareas de los sensores concurrentemente
+#     await asyncio.gather(
+#         Camilo.CreatorTask(),
+#         Erika.CreatorTask()
+#     )
+
+# asyncio.run(Inicial())
