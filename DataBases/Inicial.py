@@ -89,7 +89,8 @@ async def Get_SNMP(**task):
             )
 
             db.add(db_history)
-            db.commit()
+            state = db.commit()
+            print('estado')
             db.refresh(db_history)
 
 

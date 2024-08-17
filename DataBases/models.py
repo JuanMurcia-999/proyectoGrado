@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Date, Time
+from sqlalchemy import Column, ForeignKey, Integer, String, Date, Time, Text
 from sqlalchemy.orm import relationship
 from database import Base
 from sqlalchemy.sql import func
@@ -68,7 +68,8 @@ class Active_default(Base):
     id_active= Column(Integer, autoincrement=True, primary_key=True)
     id_feature = Column(Integer, ForeignKey('default_features.id_feature'), nullable=False)
     id_agent = Column(Integer, ForeignKey('agents.id_agent'), nullable=False)
-
+    params= Column(Text, nullable=True)
+    
     features = relationship('Default_features')
     agents = relationship('Agents')
 

@@ -1,8 +1,7 @@
 from pysnmp.smi.rfc1902 import ObjectIdentity, ObjectType
 from slim.slim_bulk import get_bulk
 from slim.slim_get import slim_get
-import asyncio
-import json
+
 
 
 
@@ -12,8 +11,6 @@ async def create_object_types(base_oid, indices):
 
       
 async def interfaceTable(community,host):
-    #community='public'
-    #host='192.168.20.25'
     port=161
     OID_IFTABLE='1.3.6.1.2.1.2.2.1'
     indices = list(range(1, 23)) 
@@ -68,12 +65,4 @@ async def interfaceTable(community,host):
         'ifOutQLen':int(temp[i+20]),  
         'ifSpecific':float(str(temp[i+21])),    
         })
-
-    
-    
-    
-    #with open('data.json', 'w') as file:
-    #    json.dump(iftable, file, indent=4)
-
     return iftable
-#asyncio.run(interfaceTable())
