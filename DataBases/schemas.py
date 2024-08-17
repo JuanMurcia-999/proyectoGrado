@@ -40,7 +40,16 @@ class AgentWithType(Agent):
 
 
 #features
+
 class new_features(BaseModel):
+    id_adminis: int |None
+    ag_name:str
+    id_agent :int
+    oid: str
+    adminis_name:str
+    timer : int
+
+class features(BaseModel):
     id_agent :int
     oid: str
     adminis_name:str
@@ -50,7 +59,7 @@ class new_features(BaseModel):
         orm_mode=True 
 
 
-class Features(new_features):
+class Features(features):
     id_adminis:int
 
     class config:

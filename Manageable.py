@@ -1,25 +1,25 @@
 import asyncio
 from Gestionables import AnchoBanda,Processes
-from slim.slim_get import slim_get
-from pysnmp.smi.rfc1902 import ObjectIdentity, ObjectType
 from DataBases.taskoid import sensorOID
 
 
 
 class ManageableGeneral:
-    def __init__(self, ip: str, name: str) -> None:
+    def __init__(self, ip: str, name: str,id:int) -> None:
         self.name = name
         self.ip = ip
+        self.id = id
     
-    async def Networktraffic(self, num_interface: str, intervalo: int, task_id: str) -> None:
+    async def Networktraffic(self, params,nametask,cola) -> None:
+        taskname = nametask+params['num_interface']
         try:
             # Crear una tarea para ejecutar AnchoBanda y agregarla al diccionario de tareas
             task = asyncio.create_task(
-                AnchoBanda(host=self.ip, Num_Interface=num_interface, intervalo=intervalo).run()
+                AnchoBanda(host=self.ip, Num_Interface= params['num_interface'], intervalo= params['timer'],id_adminis=params['id_adminis'],id=self.id, cola=cola ).run()
             )
             if hasattr(self, 'tasks'):
-                self.tasks[task_id] = task  
-            print(f'Nombre: {self.name}  | IP: {self.ip} | Interfaz: {num_interface}')
+                self.tasks[taskname] = task  
+            print(f'Nombre: {self.name}  | IP: {self.ip} | Interfaz: {params['num_interface']}')
         except Exception as e:
             print(f'Error en la descripción: {e}')
 
@@ -30,7 +30,7 @@ class ManageableGeneral:
 class ManageablePC(ManageableGeneral):
 
     def __init__(self, ip: str, name: str,id:int) -> None:
-        super().__init__(ip, name)
+        super().__init__(ip, name,id)
         self.tasks = {}
         self.taskoid=[]
         self.id= id
@@ -39,10 +39,10 @@ class ManageablePC(ManageableGeneral):
     async def saludar(self):
         print(f'estoy saludando con el equipo {self.name} que es PC')
 
-    async def NumProccesses(self, params, task_id):
+    async def NumProccesses(self, params, task_id,cola):
         try:
             task = asyncio.create_task(
-                Processes(ip=self.ip, timer=params['timer']).TaskNumProcesses()
+                Processes(ip=self.ip, timer=params['timer'],id_adminis=params['id_adminis'],id=self.id, cola=cola).TaskNumProcesses()
             )
             if self.tasks is not None:
                 self.tasks[task_id] = task
@@ -50,10 +50,10 @@ class ManageablePC(ManageableGeneral):
         except Exception as e:
               print(f'Error en la descripción: {e}')
  
-    async def MemorySize(self, params, task_id):
+    async def MemorySize(self, params, task_id,cola):
         try:
             task = asyncio.create_task(
-                Processes(ip=self.ip, timer=params['timer']).TaskMemorySize()
+                Processes(ip=self.ip, timer=params['timer'], id_adminis=params['id_adminis'],id=self.id, cola=cola).TaskMemorySize()
             )
             if self.tasks is not None:
                 self.tasks[task_id] = task
@@ -124,18 +124,3 @@ class ManageableRT(ManageableGeneral):
         except asyncio.CancelledError:
             # La tarea fue cancelada, capturamos la excepción
             print(f'Tarea cancelada: {task}')
-
-
-
-
-# async def main():
-#     pc = ManageablePC(ip="192.168.20.25", name="Camilo")
-#     await pc.Networktraffic(num_interface="12", intervalo=10, task_id="task1")
-#     #await pc.NumProccesses(timer=5, task_id="task2")
-#     #await pc.Iniciar()
-
-#     # Para cancelar la tarea después de un tiempo
-#     await asyncio.sleep(30)
-#     pc.cancelar_tarea("task1")
-
-# asyncio.run(main())
