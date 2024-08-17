@@ -77,6 +77,17 @@ def delete_feature(db: Session,id):
         return True
     return True
 
+
+def delete_active_default(db:Session, dates:schemas.Manageable):
+    db_active = db.query(models.Active_default).filter( and_(models.Active_default.id_feature == dates.id_feature,models.Active_default.id_agent == dates.id_agent ) ).first()
+    #print(f'{db_active.id_active} ::::: {db_active.id_feature} ::::::: {db_active.id_agent}')
+
+    if db_active:
+         db.delete(db_active)
+         db.commit()
+         return "tarea eliminada"
+    return "Esta tarea ya fue cancelada o no es posible"
+
 # ---------------------------------------------------------------------------------------------HISTORY
 
 def get_history_sensor(db:Session,filter:schemas.getHistory):

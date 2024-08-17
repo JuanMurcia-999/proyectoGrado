@@ -239,6 +239,8 @@ async def stop_instance(request:schemas.Manageable,db:Session=Depends(get_db)):
     await instance.Iniciar()
     return {"result": 'tarea cancelada'}            
 
+
+
 #---------------------------------------------------------------------------------PRUEBAS
     
      
