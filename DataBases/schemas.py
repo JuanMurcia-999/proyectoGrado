@@ -43,6 +43,7 @@ class AgentWithType(Agent):
 
 class new_features(BaseModel):
     id_adminis: int |None
+    id_sensor: int | None
     ag_name:str
     id_agent :int
     oid: str
@@ -60,7 +61,8 @@ class features(BaseModel):
 
 
 class Features(features):
-    id_adminis:int
+    id_adminis:int|None
+    id_sensor: int|None 
 
     class config:
         orm_mode=True 
@@ -110,31 +112,33 @@ class SensorCreate(BaseModel):
 class addHistory(BaseModel):
     id_agent:int
     id_adminis:int
-    value:str
+    value:Any
 
 class readHistory(addHistory):
     id_register:int
     date:date
     time:time
 
-
-class HistoryWithFeature():
-    pass
-
+    class config:
+        orm_mode=True
 
 
+class historywithfeature(readHistory):
+    feature: Features
 
-
+    class config:
+        orm_mode=True 
 
 
 
 class getHistory(BaseModel):
     id_agent:int
+    id_sensor:int|None
     id_adminis:int
 
 
 class responseHistory(BaseModel):
-    value:list[str]
+    value:Dict[str, Any]
     created_at:list[str]
 
 
@@ -181,6 +185,18 @@ class ActiveWithFeature(ReadAddactivedefault):
 
     class Config:
         orm_mode=True
+
+
+#-----------------------------------------------------------------------------------ALARMAS
+
+class newAlarm(BaseModel):
+   
+    id_agent: int
+    id_adminis:int
+    id_sensor:int |None
+    operation: str
+    value: float
+    counter: int|None
 
 
 #--------------------------- pruebas

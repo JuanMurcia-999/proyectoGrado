@@ -58,6 +58,7 @@ def new_feature(db:Session, feature: schemas.new_features):
 
     db_agent= models.Administered_features(
     id_adminis=feature.id_adminis,
+    id_sensor= feature.id_sensor,
     id_agent=feature.id_agent, 
     oid= feature.oid, 
     adminis_name = feature.adminis_name,
@@ -89,16 +90,58 @@ def delete_active_default(db:Session, dates:schemas.Manageable):
     return "Esta tarea ya fue cancelada o no es posible"
 
 # ---------------------------------------------------------------------------------------------HISTORY
-
+#getattr(models.Agents,field) == value
 def get_history_sensor(db:Session,filter:schemas.getHistory):
+
+
+    if filter.id_sensor is None:
+        condition = filter.id_adminis
+        column ='id_adminis'
+    else:  
+        condition = filter.id_sensor
+        column='id_sensor'
+
+
     response = db.query(models.History_features.value,models.History_features.date).filter(
-        models.History_features.id_adminis == filter.id_adminis  ,models.History_features.id_agent == filter.id_agent).order_by(
+         models.History_features.id_adminis == condition,models.History_features.id_agent == filter.id_agent).order_by(
             models.History_features.id_register.desc()
         )
+    namesensor = db.query(models.Administered_features.adminis_name).filter(
+        getattr(models.Administered_features, column )== condition
+    ).all()
+
+    name =namesensor[0][0]
     values = [item[0] for item in response]
     date =  [item[1].strftime('%Y-%m-%d')    for item in response]
+    
+
     return {
-        'value': values,
+        'value': {name:values},
+        'created_at': date
+    }
+
+
+
+# Modelo de respuesta par las interfaces
+
+def get_history_Network(db:Session,filter: schemas.getHistory):
+
+    IN = db.query(models.History_features.value,models.History_features.date).filter(
+         models.History_features.id_adminis == 1001,models.History_features.id_agent == filter.id_agent).order_by(
+            models.History_features.id_register.desc()
+        )
+    OUT = db.query(models.History_features.value,models.History_features.date).filter(
+         models.History_features.id_adminis == 1002,models.History_features.id_agent == filter.id_agent).order_by(
+            models.History_features.id_register.desc()
+        )
+
+    valuesIN = [item[0] for item in IN]
+    valuesOUT = [item[0] for item in OUT]
+    date =  [item[1].strftime('%Y-%m-%d')    for item in IN]
+
+
+    return{
+         'value': {"valuesIN":valuesIN,"valuesOUT":valuesOUT},
         'created_at': date
     }
 
@@ -167,7 +210,7 @@ def add_active_default(db:Session, dates: schemas.Manageable):
 
 def delete_feature_two(db:Session, dates:schemas.Manageable):
     db_active = db.query(models.Active_default).filter( and_(models.Active_default.id_feature == dates.id_feature,models.Active_default.id_agent == dates.id_agent ) ).first()
-    #print(f'{db_active.id_active} ::::: {db_active.id_feature} ::::::: {db_active.id_agent}')
+    
 
     if db_active:
          db.delete(db_active)
@@ -185,3 +228,21 @@ def delete_feature_two(db: Session,name,id):
         db.commit()
         return True
     return False  
+
+#------------------------------------------------------------------------------------ ALARMAS
+
+
+def add_alarm(db: Session, alarm:schemas.newAlarm):
+    addalarm = models.Alarms(
+        id_agent = alarm.id_agent,
+        id_adminis = alarm.id_adminis,
+        id_sensor= alarm.id_sensor,
+        operation =  alarm.operation,
+        value =  alarm.value   
+    )
+
+    db.add(addalarm)
+    db.commit()
+    db.refresh(addalarm)
+    db.close()
+    return addalarm

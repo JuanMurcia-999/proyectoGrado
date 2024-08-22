@@ -2,6 +2,7 @@ from pysnmp.smi.rfc1902 import ObjectIdentity, ObjectType
 from slim.slim_get import slim_get
 import asyncio
 from DataBases import schemas
+import json
 
 
 
@@ -52,14 +53,30 @@ class AnchoBanda:
                 [in_kbps, out_kbps] = in_bps / 1000, out_bps / 1000
 
                 print(f'Kbps IN: {in_kbps} /// Kbps OUT {out_kbps} ::::: {self.id_adminis}')
-                datos={
+                datavalue ={
+                    "kbps_IN": in_kbps,
+                    "kbps_OUT": out_kbps
+                }
+               
+                dIn={
                     'id_agent': self.id,
-                    'id_adminis':self.id_adminis,
-                    'value':str( f'{in_kbps} ::: {out_kbps}')
+                    'id_adminis':self.id_adminis + 901,
+                    'value': round(in_kbps,3)
+                }
+                
+            
+                dOut={
+                    'id_agent': self.id,
+                    'id_adminis':self.id_adminis + 902,
+                    'value': round(out_kbps,3)
                 }
 
-                record = schemas.addHistory(**datos)
-                self.cola.encolar(record)
+                record1 = schemas.addHistory(**dIn)
+                record2 = schemas.addHistory(**dOut)
+                print(record1)
+                print(record2)
+                self.cola.encolar(record1)
+                self.cola.encolar(record2)
 
             except asyncio.CancelledError:
                 print(f'Task was cancelled')
@@ -68,7 +85,7 @@ class AnchoBanda:
 class Processes:
     def __init__(self, ip:str,timer:int, id_adminis:int,id:int, cola ) -> None:
         self.ip=ip
-        self.timer=timer|10
+        self.timer=timer|80
         self.stop_flag = asyncio.Event()
         self.id_adminis =  id_adminis
         self.id = id
@@ -88,7 +105,7 @@ class Processes:
                 datos={
                     'id_agent': self.id,
                     'id_adminis':self.id_adminis,
-                    'value': str(num_processes)
+                    'value': num_processes
                 }
 
                 record = schemas.addHistory(**datos)
@@ -115,7 +132,7 @@ class Processes:
                 datos={
                     'id_agent': self.id,
                     'id_adminis':self.id_adminis,
-                    'value': str(MemorySize)
+                    'value': MemorySize
                 }
 
                 record = schemas.addHistory(**datos)

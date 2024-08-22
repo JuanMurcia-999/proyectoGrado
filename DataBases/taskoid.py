@@ -13,6 +13,7 @@ from slim.slim_bulk import get_bulk
 import models
 import schemas
 from Colahistory import HistoryFIFO
+from ColaAlarms import AlarmsFIFO
 
 # Configuración de la base de datos
 DATABASE_URL = "sqlite:///C:/Users/Juan Murcia/Desktop/Proyecto de grado/Desarrollo/Recolector/DataBases/productos.sqlite"
@@ -21,6 +22,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
 
 colaoid = HistoryFIFO()
+alarm = AlarmsFIFO()
 
 async def Totalagentes(id_agent: int, ip_agent: str):
     allelements = []
@@ -75,11 +77,12 @@ async def Get_SNMP(**task):
             datos={
                     'id_agent': task['ID'],
                     'id_adminis':task['IDF'],
-                    'value':str( value)
+                    'value':value
                 }
 
             record = schemas.addHistory(**datos)
             colaoid.encolar(record)
+            alarm.encolar(record)
 
 class sensorOID:
     def __init__(self, ip: str, id: int) -> None:

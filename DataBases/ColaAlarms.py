@@ -6,8 +6,9 @@ import os
 # Añade el directorio raíz al sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
+from BotTelegram import sendmessage
 import models
 
 
@@ -18,7 +19,7 @@ db = SessionLocal()
 
 
 
-class HistoryFIFO:
+class AlarmsFIFO:
     def __init__(self):
         self.cola = deque()
 
@@ -41,32 +42,36 @@ class HistoryFIFO:
 
     def procesar_tareas(self):
         while not self.esta_vacia():
-            #print(f'Longitud:::  {len(self.cola)}')
             tarea = self.desencolar()
-            #print(f"Procesando tarea: {tarea}")
-            exito = self.add_history(tarea)
+            exito = self.check_alarm(tarea)
             if exito:
-                print(f"Tarea completada con éxito.")
+                print(f"Alarm comprobada")
+                sendmessage(f'{tarea} detectada')
             else:
-                print(f"Tarea falló. Reintentando...")
-                self.encolar(tarea)  # Volver a encolar la tarea para reintentar
+                print(f"Alarm sin cumplir")
 
-    def add_history(self, data):
+    def check_alarm(self, data):
         try:    
-            db = SessionLocal()  # Asegúrate de que cada tarea tenga su propia sesión
-            db_history = models.History_features(
-                id_agent=data.id_agent,
-                id_adminis=data.id_adminis,
-                value=str(data.value)
-            )
-
-            db.add(db_history)
-            db.commit()
-            db.refresh(db_history)
-            db.close()
-            return True
+            if data.id_adminis < 100:
+                column ='id_adminis'
+            else:
+                column ='id_sensor'
+            
+            response =  db.query(models.Alarms).join(
+                    models.Administered_features,
+                    models.Alarms.id_adminis == models.Administered_features.id_adminis
+                ).filter(and_(
+                    getattr(models.Administered_features,column) == data.id_adminis,
+                    models.Administered_features.id_agent ==data.id_agent 
+                    )
+                ).first()
+            if response:
+                evaluation= f'{data.value} {response.operation} {response.value}'
+            return eval(evaluation)
         except Exception:
             return False
+        finally:
+            pass
 
 
 

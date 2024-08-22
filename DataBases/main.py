@@ -16,14 +16,15 @@ import crud,models,schemas
 from database import SessionLocal,engine
 from Manageable import ManageablePC, ManageableRT
 
+
 import json
 from Colahistory import HistoryFIFO
-
+from ColaAlarms import AlarmsFIFO
 
 models.Base.metadata.create_all(bind=engine)  # crea la base de datos si no existe
 
 cola =  HistoryFIFO() 
-
+alarms = AlarmsFIFO()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -176,7 +177,10 @@ async def read_agents(host:str):
 #Obtener el historial segun el sensor (OID)
 @app.post("/history/sensor/",response_model=schemas.responseHistory)
 def read_history_sensor(filter: schemas.getHistory, db:Session=Depends(get_db)):
-    return crud.get_history_sensor(db=db, filter=filter)
+    if filter.id_sensor == 100:
+        return crud.get_history_Network(db=db, filter=filter)
+    else:
+        return crud.get_history_sensor(db=db, filter=filter)
 
 
 
@@ -200,7 +204,8 @@ async def create_instance(request: schemas.Manageable, db:Session=Depends(get_db
     print(request)
     
     datos = {
-        "id_adminis": request.params['id_adminis'],
+        "id_adminis":None,
+        "id_sensor": request.params['id_adminis'],
         "ag_name": "",
         "id_agent": request.id_agent,
         "oid": "",
@@ -239,6 +244,13 @@ async def stop_instance(request:schemas.Manageable,db:Session=Depends(get_db)):
     await instance.Iniciar()
     return {"result": 'tarea cancelada'}            
 
+
+#--------------------------------------------------------------------------------- ALARMAS
+
+@app.post("/alarms/new/")
+async def new_alarm(alarm:schemas.newAlarm, db:Session=Depends(get_db)):
+    print(alarm)
+    return crud.add_alarm(db=db, alarm=alarm)
 
 
 #---------------------------------------------------------------------------------PRUEBAS

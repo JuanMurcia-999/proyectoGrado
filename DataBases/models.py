@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Date, Time, Text
+from sqlalchemy import Column, ForeignKey, Integer, String, Date, Time, Text, Numeric, Float
 from sqlalchemy.orm import relationship
 from database import Base
 from sqlalchemy.sql import func
@@ -45,6 +45,7 @@ class Administered_features(Base):
     __tablename__ = "administered_features"
 
     id_adminis = Column(Integer, autoincrement=True, primary_key=True)
+    id_sensor = Column(Integer, nullable=True)
     id_agent = Column(Integer, ForeignKey("agents.id_agent"), nullable=False)
     oid = Column(String, nullable=False)
     adminis_name = Column(String, nullable=False)
@@ -80,10 +81,23 @@ class History_features(Base):
     id_register = Column(Integer, autoincrement=True, primary_key=True)
     id_agent = Column(Integer, ForeignKey("agents.id_agent"), nullable=False)
     id_adminis = Column(Integer, ForeignKey('administered_features.id_adminis'), nullable=False)
-    value = Column(String, nullable=False)
+    value = Column(Float, nullable=False)
     date = Column(Date, server_default=func.current_date())
     time = Column(Time, server_default=func.current_time())
 
     agent = relationship('Agents')
-    administered_feature = relationship('Administered_features')
+    feature = relationship('Administered_features')
 
+class Alarms (Base):
+
+    __tablename__ ='alarms'
+
+    id_alarm = Column(Integer, autoincrement=True, primary_key=True)
+    id_agent = Column(Integer, ForeignKey("agents.id_agent"), nullable=False)
+    id_adminis =Column(Integer, nullable=True)
+    id_sensor = Column(Integer, nullable=True)
+    operation = Column(String, nullable=False)
+    value = Column(Integer, nullable=False)
+    counter =  Column(Integer, nullable=True)
+
+    
