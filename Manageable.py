@@ -10,12 +10,13 @@ class ManageableGeneral:
         self.ip = ip
         self.id = id
     
-    async def Networktraffic(self, params,nametask,cola) -> None:
+    async def Networktraffic(self, params,nametask,cola,alarms) -> None:
         taskname = nametask+params['num_interface']
+        print(taskname)
         try:
             # Crear una tarea para ejecutar AnchoBanda y agregarla al diccionario de tareas
             task = asyncio.create_task(
-                AnchoBanda(host=self.ip, Num_Interface= params['num_interface'], intervalo= params['timer'],id_adminis=params['id_adminis'],id=self.id, cola=cola ).run()
+                AnchoBanda(host=self.ip, Num_Interface= params['num_interface'], intervalo= params['timer'],id_adminis=params['id_adminis'],id=self.id, cola=cola,alarms=alarms ).run()
             )
             if hasattr(self, 'tasks'):
                 self.tasks[taskname] = task  
@@ -39,10 +40,10 @@ class ManageablePC(ManageableGeneral):
     async def saludar(self):
         print(f'estoy saludando con el equipo {self.name} que es PC')
 
-    async def NumProccesses(self, params, task_id,cola):
+    async def NumProccesses(self, params, task_id,cola,alarms):
         try:
             task = asyncio.create_task(
-                Processes(ip=self.ip, timer=params['timer'],id_adminis=params['id_adminis'],id=self.id, cola=cola).TaskNumProcesses()
+                Processes(ip=self.ip, timer=params['timer'],id_adminis=params['id_adminis'],id=self.id, cola=cola, alarms=alarms).TaskNumProcesses()
             )
             if self.tasks is not None:
                 self.tasks[task_id] = task
@@ -50,10 +51,10 @@ class ManageablePC(ManageableGeneral):
         except Exception as e:
               print(f'Error en la descripción: {e}')
  
-    async def MemorySize(self, params, task_id,cola):
+    async def MemorySize(self, params, task_id,cola,alarms):
         try:
             task = asyncio.create_task(
-                Processes(ip=self.ip, timer=params['timer'], id_adminis=params['id_adminis'],id=self.id, cola=cola).TaskMemorySize()
+                Processes(ip=self.ip, timer=params['timer'], id_adminis=params['id_adminis'],id=self.id, cola=cola, alarms=alarms).TaskMemorySize()
             )
             if self.tasks is not None:
                 self.tasks[task_id] = task

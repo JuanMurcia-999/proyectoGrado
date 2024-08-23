@@ -4,7 +4,7 @@ import os
 
 
 # Añade el directorio raíz al sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -15,7 +15,6 @@ DATABASE_URL = "sqlite:///C:/Users/Juan Murcia/Desktop/Proyecto de grado/Desarro
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
-
 
 
 class HistoryFIFO:
@@ -41,9 +40,9 @@ class HistoryFIFO:
 
     def procesar_tareas(self):
         while not self.esta_vacia():
-            #print(f'Longitud:::  {len(self.cola)}')
+            # print(f'Longitud:::  {len(self.cola)}')
             tarea = self.desencolar()
-            #print(f"Procesando tarea: {tarea}")
+            # print(f"Procesando tarea: {tarea}")
             exito = self.add_history(tarea)
             if exito:
                 print(f"Tarea completada con éxito.")
@@ -52,12 +51,12 @@ class HistoryFIFO:
                 self.encolar(tarea)  # Volver a encolar la tarea para reintentar
 
     def add_history(self, data):
-        try:    
+        try:
             db = SessionLocal()  # Asegúrate de que cada tarea tenga su propia sesión
             db_history = models.History_features(
                 id_agent=data.id_agent,
                 id_adminis=data.id_adminis,
-                value=str(data.value)
+                value=str(data.value),
             )
 
             db.add(db_history)
@@ -67,9 +66,3 @@ class HistoryFIFO:
             return True
         except Exception:
             return False
-
-
-
-
-
-

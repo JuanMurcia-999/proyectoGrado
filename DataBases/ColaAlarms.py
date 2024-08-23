@@ -4,7 +4,7 @@ import os
 
 
 # Añade el directorio raíz al sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
@@ -16,7 +16,6 @@ DATABASE_URL = "sqlite:///C:/Users/Juan Murcia/Desktop/Proyecto de grado/Desarro
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
-
 
 
 class AlarmsFIFO:
@@ -45,36 +44,47 @@ class AlarmsFIFO:
             tarea = self.desencolar()
             exito = self.check_alarm(tarea)
             if exito:
-                print(f"Alarm comprobada")
-                sendmessage(f'{tarea} detectada')
+                if tarea.id_adminis < 100:
+                    column = "id_adminis"
+                else:
+                    column = "id_sensor"
+                query = (
+                    db.query(models.Administered_features)
+                    .filter(
+                        getattr(models.Administered_features, column)
+                        == tarea.id_adminis
+                    )
+                    .first()
+                )
+                message = f"ALARMA ACTIVA \n Sensor : {query.adminis_name} \n "
+                sendmessage(message)
             else:
                 print(f"Alarm sin cumplir")
 
     def check_alarm(self, data):
-        try:    
+        try:
             if data.id_adminis < 100:
-                column ='id_adminis'
+                column = "id_adminis"
             else:
-                column ='id_sensor'
-            
-            response =  db.query(models.Alarms).join(
+                column = "id_sensor"
+
+            response = (
+                db.query(models.Alarms)
+                .join(
                     models.Administered_features,
-                    models.Alarms.id_adminis == models.Administered_features.id_adminis
-                ).filter(and_(
-                    getattr(models.Administered_features,column) == data.id_adminis,
-                    models.Administered_features.id_agent ==data.id_agent 
+                    models.Alarms.id_adminis == models.Administered_features.id_adminis,
+                )
+                .filter(
+                    and_(
+                        getattr(models.Administered_features, column)
+                        == data.id_adminis,
+                        models.Administered_features.id_agent == data.id_agent,
                     )
-                ).first()
+                )
+                .first()
+            )
             if response:
-                evaluation= f'{data.value} {response.operation} {response.value}'
+                evaluation = f"{data.value} {response.operation} {response.value}"
             return eval(evaluation)
         except Exception:
             return False
-        finally:
-            pass
-
-
-
-
-
-

@@ -3,7 +3,7 @@ import os
 import asyncio
 
 # Añade el directorio raíz al sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -24,6 +24,7 @@ db = SessionLocal()
 colaoid = HistoryFIFO()
 alarm = AlarmsFIFO()
 
+
 async def Totalagentes(id_agent: int, ip_agent: str):
     allelements = []
     db = SessionLocal()  # Asegúrate de que cada tarea tenga su propia sesión
@@ -33,56 +34,67 @@ async def Totalagentes(id_agent: int, ip_agent: str):
         OIDS = []
         IDF = []
 
-        intervalos = db.query(models.Administered_features.timer, models.Administered_features.id_adminis).filter(
-            models.Administered_features.id_agent == id_agent,
-            models.Administered_features.oid != '').distinct().all()
+        intervalos = (
+            db.query(
+                models.Administered_features.timer,
+                models.Administered_features.id_adminis,
+            )
+            .filter(
+                models.Administered_features.id_agent == id_agent,
+                models.Administered_features.oid != "",
+            )
+            .distinct()
+            .all()
+        )
 
         for inter in intervalos:
             TIMES.append(inter.timer)
             IDF.append(inter.id_adminis)
-            features = db.query(models.Administered_features.oid, models.Administered_features.id_adminis).filter(
-                models.Administered_features.timer == f'{inter.timer}',
-                models.Administered_features.id_agent == id_agent,
-                models.Administered_features.oid != '').all()
+            features = (
+                db.query(
+                    models.Administered_features.oid,
+                    models.Administered_features.id_adminis,
+                )
+                .filter(
+                    models.Administered_features.timer == f"{inter.timer}",
+                    models.Administered_features.id_agent == id_agent,
+                    models.Administered_features.oid != "",
+                )
+                .all()
+            )
 
             OIDS.append([item.oid for item in features])
 
         allelements.append(
-            {
-                "ID": id_agent,
-                "IP": ip_agent,
-                "TIMES": TIMES,
-                "OIDS": OIDS,
-                "IDF": IDF
-            }
+            {"ID": id_agent, "IP": ip_agent, "TIMES": TIMES, "OIDS": OIDS, "IDF": IDF}
         )
         return allelements
     finally:
         db.close()
 
+
 async def Get_SNMP(**task):
     while True:
-        await asyncio.sleep(task['TIME'])
+        await asyncio.sleep(task["TIME"])
         varBinds = await get_bulk(
-            'public', task['IP'], 161,
-            0, 1,  # nonRepeaters, maxRepetitions
-            *task['OIDS']
+            "public",
+            task["IP"],
+            161,
+            0,
+            1,  # nonRepeaters, maxRepetitions
+            *task["OIDS"],
         )
 
         for varBind in varBinds:
             oid, value = varBind[0]
             print(f"{task['TIME']}::::{oid}::: {value.prettyPrint()}::: {task['IP']}")
 
-
-            datos={
-                    'id_agent': task['ID'],
-                    'id_adminis':task['IDF'],
-                    'value':value
-                }
+            datos = {"id_agent": task["ID"], "id_adminis": task["IDF"], "value": value}
 
             record = schemas.addHistory(**datos)
             colaoid.encolar(record)
             alarm.encolar(record)
+
 
 class sensorOID:
     def __init__(self, ip: str, id: int) -> None:
@@ -96,9 +108,15 @@ class sensorOID:
         elements = await Totalagentes(self.id, self.ip)
         print(elements)
         for agent in elements:
-            for TIME, OIDS, IDF in zip(agent['TIMES'], agent['OIDS'], agent['IDF']):
-                oid = [ObjectType(ObjectIdentity(f'{oid}')) for oid in OIDS]
-                self.tasks.append(asyncio.create_task(Get_SNMP(TIME=TIME, OIDS=oid, ID=agent['ID'], IDF=IDF, IP=agent['IP'])))
+            for TIME, OIDS, IDF in zip(agent["TIMES"], agent["OIDS"], agent["IDF"]):
+                oid = [ObjectType(ObjectIdentity(f"{oid}")) for oid in OIDS]
+                self.tasks.append(
+                    asyncio.create_task(
+                        Get_SNMP(
+                            TIME=TIME, OIDS=oid, ID=agent["ID"], IDF=IDF, IP=agent["IP"]
+                        )
+                    )
+                )
         print(self.tasks)
 
 
