@@ -57,7 +57,8 @@ app.add_middleware(
 #         response.headers['Content-Security-Policy'] = "default-src 'self'; connect-src 'self' ws://localhost:8000"
 #     return response
 
-instances = {}
+
+instances = {} 
 
 
 def get_db():
@@ -102,7 +103,6 @@ async def activator_tasks(name: str, nametask: str, params):
         raise HTTPException(status_code=404, detail="Instance not found")
 
     task_mapping = {
-        "saludar": instance.saludar,
         "NumProccesses": instance.NumProccesses,
         "MemorySize": instance.MemorySize,
         "Networktraffic": instance.Networktraffic,

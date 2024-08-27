@@ -17,7 +17,7 @@ from datetime import datetime
 
 
 # Configuración de la base de datos
-DATABASE_URL = "sqlite:///C:/Users/Juan Murcia/Desktop/Proyecto de grado/Desarrollo/Recolector/DataBases/productos.sqlite"
+DATABASE_URL = "sqlite:///productos.sqlite"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
