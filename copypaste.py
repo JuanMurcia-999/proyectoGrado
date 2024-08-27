@@ -1,41 +1,33 @@
-@app.post("/exect-task/")
-async def create_instance(request: schemas.Manageable, db: Session = Depends(get_db)):
-    datos = {
-        "id_adminis": None,
-        "id_sensor": request.params["id_adminis"],
-        "ag_name": "",
-        "id_agent": request.id_agent,
-        "oid": "",
-        "adminis_name": (
-            lambda x: (
-                request.nametask
-                if request.nametask != "Networktraffic"
-                else request.nametask + request.params["num_interface"]
-            )
-        )(None),
-        "timer": request.params["timer"],
-    }
+from pysnmp.smi import builder, view, compiler, rfc1902
 
-    feature = schemas.new_features(**datos)
+def load_mibs_from_folder(mib_folder):
+    # Create a MibBuilder instance
+    mib_builder = builder.MibBuilder()
+    
+    # Load MIBs from the specified folder
+    mib_builder.addMibSources(builder.DirMibSource(mib_folder))
+    
+    # Compile ASN.1 MIBs into PySNMP Python objects (if needed)
+    compiler.addMibCompiler(mib_builder, sources=[mib_folder])
+    
+    # Load all MIBs from the folder
+    mib_builder.loadModules()
+    
+    return mib_builder
 
-    state = await activator_tasks(
-        name=request.name, nametask=request.nametask, params=request.params
-    )
-    if state:
-        crud.add_active_default(db=db, dates=request)
-        if request.nametask == "Networktraffic":
-            for i in range(0, 2):
-                id_sensor = int(
-                    str(request.params["id_adminis"])
-                    + str(request.params["num_interface"])
-                    + f"{i}"
-                )
-                feature.id_sensor = id_sensor
-                feature.adminis_name = feature.adminis_name + (
-                    lambda x: "IN" if i == 0 else "OUT"
-                )(None)
-                crud.new_feature(db=db, feature=feature)
-        else:
-            crud.new_feature(db=db, feature=feature)
-    else:
-        raise HTTPException(status_code=400, detail="Tarea no subida")
+def list_mib_objects(mib_builder):
+    mib_view = view.MibViewController(mib_builder)
+    
+    for mib_module in mib_builder.mibSymbols:
+        print(f"\nMIB Module: {mib_module}")
+        for mib_object in mib_builder.mibSymbols[mib_module]:
+            try:
+                oid = rfc1902.ObjectIdentity(mib_module, mib_object).resolveWithMib(mib_view)
+                print(f"Object: {mib_object}, OID: {oid}")
+            except Exception as e:
+                print(f"Could not resolve {mib_object}: {e}")
+
+if __name__ == "__main__":
+    mib_folder = input("Enter the path to your MIB folder: ")
+    mib_builder = load_mibs_from_folder(mib_folder)
+    list_mib_objects(mib_builder)

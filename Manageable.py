@@ -1,6 +1,7 @@
 import asyncio
-from Gestionables import AnchoBanda,Processes
+from Gestionables import AnchoBanda,Processes, ping
 from DataBases.taskoid import sensorOID
+from DataBases import schemas
 
 
 
@@ -9,20 +10,31 @@ class ManageableGeneral:
         self.name = name
         self.ip = ip
         self.id = id
+        self.state = False
     
     async def Networktraffic(self, params,nametask,cola,alarms) -> None:
         taskname = nametask+params['num_interface']
         print(taskname)
         try:
             # Crear una tarea para ejecutar AnchoBanda y agregarla al diccionario de tareas
+            Config = {"ip":self.ip, "Num_Interface": params['num_interface'], "intervalo":params['timer'],
+                      "id_adminis":params['id_adminis'],"id":self.id, "history":cola,"alarms":alarms}
+            Config = schemas.ConfigAnchoBanda(**Config)
             task = asyncio.create_task(
-                AnchoBanda(host=self.ip, Num_Interface= params['num_interface'], intervalo= params['timer'],id_adminis=params['id_adminis'],id=self.id, cola=cola,alarms=alarms ).run()
+                AnchoBanda(Config=Config).run()
             )
             if hasattr(self, 'tasks'):
                 self.tasks[taskname] = task  
             print(f'Nombre: {self.name}  | IP: {self.ip} | Interfaz: {params['num_interface']}')
         except Exception as e:
             print(f'Error en la descripción: {e}')
+        
+    async def state_device(self):
+        #self.state = await ping(self.ip)
+        
+        #print(f'agente {self.name} Activo: {self.state}')
+        return True
+
 
 
 
@@ -42,8 +54,10 @@ class ManageablePC(ManageableGeneral):
 
     async def NumProccesses(self, params, task_id,cola,alarms):
         try:
+            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id, "history":cola, "alarms":alarms}
+            Config = schemas.ConfigProcesses(**Config)
             task = asyncio.create_task(
-                Processes(ip=self.ip, timer=params['timer'],id_adminis=params['id_adminis'],id=self.id, cola=cola, alarms=alarms).TaskNumProcesses()
+                Processes(Config=Config).TaskNumProcesses()
             )
             if self.tasks is not None:
                 self.tasks[task_id] = task
@@ -53,8 +67,10 @@ class ManageablePC(ManageableGeneral):
  
     async def MemorySize(self, params, task_id,cola,alarms):
         try:
+            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id, "history":cola, "alarms":alarms}
+            Config = schemas.ConfigProcesses(**Config)
             task = asyncio.create_task(
-                Processes(ip=self.ip, timer=params['timer'], id_adminis=params['id_adminis'],id=self.id, cola=cola, alarms=alarms).TaskMemorySize()
+                Processes(Config=Config).TaskMemorySize()
             )
             if self.tasks is not None:
                 self.tasks[task_id] = task
@@ -66,7 +82,7 @@ class ManageablePC(ManageableGeneral):
         await self.instanceoid.CreatorTask()
 
     async def task_oid(self):
-         self.instanceoid = sensorOID(self.ip, self.id)
+         self.instanceoid = sensorOID(self.ip, self.id, self.state_device)
          await self.instanceoid.CreatorTask()
 
 
@@ -75,7 +91,7 @@ class ManageablePC(ManageableGeneral):
     async def Iniciar(self):
         # Esperar a que todas las tareas en el diccionario se completen
         if self.tasks:
-            print(self.tasks)
+      
             await asyncio.gather(*self.tasks.values())
 
     async def cancelar_tarea(self, task_id: str):
@@ -85,7 +101,7 @@ class ManageablePC(ManageableGeneral):
             task.cancel()
             # Esperar a que la tarea sea cancelada
             await self._esperar_cancelacion(task)
-        print(self.tasks)
+
 
     async def _esperar_cancelacion(self, task):
         try:

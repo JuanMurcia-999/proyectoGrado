@@ -1,6 +1,9 @@
 from pydantic import BaseModel
 from typing import Dict, Any
 from datetime import datetime, date, time
+from ColaAlarms import AlarmsFIFO
+from Colahistory import HistoryFIFO
+
 
 # esquema de datos para los elementos de la tabla Agents
 
@@ -15,14 +18,14 @@ class TypeBase(BaseModel):
 
 # Escritura
 class CreateAgent(BaseModel):
-    ag_name: str
-    ip_address: str
-    ag_type: int
+    ag_name: str | None
+    ip_address: str | None
+    ag_type: int | None
 
 
 # Lectura
 class Agent(CreateAgent):
-    id_agent: int
+    id_agent: int | None
 
     class Config:
         orm_mode = True
@@ -119,7 +122,7 @@ class readHistory(addHistory):
     time: time
 
     class config:
-        orm_mode = True
+        from_attributes = True
 
 
 class historywithfeature(readHistory):
@@ -135,9 +138,29 @@ class getHistory(BaseModel):
     id_adminis: int
 
 
-class responseHistory(BaseModel):
-    value: Dict[str, Any]
-    created_at: list[str]
+class statistics(BaseModel):
+    min: float | int
+    max: float | int
+    avg: float | int
+
+
+class DataModel(BaseModel):
+    datagrafic: list[Any]
+
+class MainModel(BaseModel):
+    data: DataModel
+
+
+class filterHistory(BaseModel):
+    id_agent: int |Any
+    id_adminis: int|Any
+    id_sensor: int | Any
+    datebase: str | Any
+    timebase: str  | Any
+    daterange: str | Any
+    timerange: str | Any
+    limit: int | Any
+    offset: int | Any
 
 
 # /////////////Modelos de los gestionables establecidos//////////////
@@ -200,6 +223,56 @@ class newAlarm(BaseModel):
 
 class readAlarm(newAlarm):
     id_alarm: int
+
+
+# -------------------------------------------- taskoid
+
+
+class elements(BaseModel):
+    ID: int
+    IP: str
+    TIMES: list[int]
+    OIDS: list[list[str]]
+    IDF: list[list[int]]
+
+
+class taskoid(BaseModel):
+    TIME: int
+    OIDS: list[Any]
+    ID: int
+    IDF: list[int]
+    IP: str
+
+
+# ---------------------------------------------------Manageable
+
+
+# ---------------------------------------------------Gestionables
+
+
+class ConfigAnchoBanda(BaseModel):
+    ip: str
+    Num_Interface: str
+    intervalo: int | None
+    id_adminis: int
+    id: int
+    history: HistoryFIFO
+    alarms: AlarmsFIFO
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
+class ConfigProcesses(BaseModel):
+    ip: str
+    timer: int | None
+    id_adminis: int
+    id: int
+    history: HistoryFIFO
+    alarms: AlarmsFIFO
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 # --------------------------- pruebas

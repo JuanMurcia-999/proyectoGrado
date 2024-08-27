@@ -9,7 +9,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from pysnmp.smi.rfc1902 import ObjectIdentity, ObjectType
 from slim.slim_get import slim_get
-from slim.slim_bulk import get_bulk
 import models
 import schemas
 from Colahistory import HistoryFIFO
@@ -26,9 +25,8 @@ alarm = AlarmsFIFO()
 
 
 async def Totalagentes(id_agent: int, ip_agent: str):
-    allelements = []
-    db = SessionLocal()  # Asegúrate de que cada tarea tenga su propia sesión
 
+    db = SessionLocal()
     try:
         TIMES = []
         OIDS = []
@@ -37,7 +35,6 @@ async def Totalagentes(id_agent: int, ip_agent: str):
         intervalos = (
             db.query(
                 models.Administered_features.timer,
-                models.Administered_features.id_adminis,
             )
             .filter(
                 models.Administered_features.id_agent == id_agent,
@@ -49,7 +46,6 @@ async def Totalagentes(id_agent: int, ip_agent: str):
 
         for inter in intervalos:
             TIMES.append(inter.timer)
-            IDF.append(inter.id_adminis)
             features = (
                 db.query(
                     models.Administered_features.oid,
@@ -64,42 +60,47 @@ async def Totalagentes(id_agent: int, ip_agent: str):
             )
 
             OIDS.append([item.oid for item in features])
+            IDF.append([item.id_adminis for item in features])
 
-        allelements.append(
-            {"ID": id_agent, "IP": ip_agent, "TIMES": TIMES, "OIDS": OIDS, "IDF": IDF}
+        return schemas.elements(
+            **{"ID": id_agent, "IP": ip_agent, "TIMES": TIMES, "OIDS": OIDS, "IDF": IDF}
         )
-        return allelements
     finally:
         db.close()
 
 
-async def Get_SNMP(**task):
+async def Get_SNMP(task: schemas.taskoid, statedevice):
     while True:
-        await asyncio.sleep(task["TIME"])
-        varBinds = await get_bulk(
-            "public",
-            task["IP"],
-            161,
-            0,
-            1,  # nonRepeaters, maxRepetitions
-            *task["OIDS"],
-        )
+        satate = await statedevice()
+        if satate:
+            try:
+                await asyncio.sleep(task.TIME)
+                varbinds = await slim_get("public", task.IP, 161, *task.OIDS)
 
-        for varBind in varBinds:
-            oid, value = varBind[0]
-            print(f"{task['TIME']}::::{oid}::: {value.prettyPrint()}::: {task['IP']}")
+                for cosa, id in zip(varbinds, task.IDF):
+                    _, value = cosa
+                    # print(f'{value}:::::: {id}')
 
-            datos = {"id_agent": task["ID"], "id_adminis": task["IDF"], "value": value}
+                    datos = {
+                        "id_agent": task.ID,
+                        "id_adminis": id,
+                        "value": round(float(value), 3),
+                    }
 
-            record = schemas.addHistory(**datos)
-            colaoid.encolar(record)
-            alarm.encolar(record)
+                    record = schemas.addHistory(**datos)
+                    colaoid.encolar(record)
+                    alarm.encolar(record)
+            except Exception:
+                continue
+        else:
+            continue
 
 
 class sensorOID:
-    def __init__(self, ip: str, id: int) -> None:
+    def __init__(self, ip: str, id: int, funcState) -> None:
         self.ip = ip
         self.id = id
+        self.statedevice = funcState
         self.tasks = []
 
     async def CreatorTask(self):
@@ -107,27 +108,22 @@ class sensorOID:
             task.cancel()
         elements = await Totalagentes(self.id, self.ip)
         print(elements)
-        for agent in elements:
-            for TIME, OIDS, IDF in zip(agent["TIMES"], agent["OIDS"], agent["IDF"]):
-                oid = [ObjectType(ObjectIdentity(f"{oid}")) for oid in OIDS]
-                self.tasks.append(
-                    asyncio.create_task(
-                        Get_SNMP(
-                            TIME=TIME, OIDS=oid, ID=agent["ID"], IDF=IDF, IP=agent["IP"]
-                        )
+
+        for TIME, OIDS, IDF in zip(elements.TIMES, elements.OIDS, elements.IDF):
+            oid = [ObjectType(ObjectIdentity(f"{oid}")) for oid in OIDS]
+            self.tasks.append(
+                asyncio.create_task(
+                    Get_SNMP(
+                        schemas.taskoid(
+                            **{
+                                "TIME": TIME,
+                                "OIDS": oid,
+                                "ID": elements.ID,
+                                "IDF": IDF,
+                                "IP": elements.IP,
+                            }
+                        ),
+                        statedevice=self.statedevice,
                     )
                 )
-        print(self.tasks)
-
-
-# async def Inicial():
-#     Camilo = sensorOID('192.168.20.25', 2)
-#     Erika = sensorOID('192.168.20.37', 3)
-
-#     # Ejecuta las tareas de los sensores concurrentemente
-#     await asyncio.gather(
-#         Camilo.CreatorTask(),
-#         Erika.CreatorTask()
-#     )
-
-# asyncio.run(Inicial())
+            )

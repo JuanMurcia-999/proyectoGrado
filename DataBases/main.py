@@ -74,6 +74,7 @@ async def create_instance_startup():
         instance = create_instance_from_Manageable(agent)
         instances[agent.ag_name] = instance
         await instance.task_oid()
+        await instance.state_device()
         sensors = (
             SessionLocal()
             .query(models.Active_default)
@@ -134,19 +135,33 @@ def read_agents(db: Session = Depends(get_db)):
 
 
 # crea agentes
-@app.post("/agents/create/", response_model=schemas.Agent)
+@app.post("/agents/create/")
 def create_agent(agent: schemas.CreateAgent, db: Session = Depends(get_db)):
-    # instance = create_instance_from_Manageable(agent)
-    # instances[agent.ag_name] = instance
-    return crud.create_agent(db=db, agent=agent)
+    id_agent = crud.create_agent(db=db, agent=agent)
+    if id_agent:
+        data = {
+            "ag_name": agent.ag_name,
+            "ip_address": agent.ip_address,
+            "ag_type": agent.ag_type,
+            "id_agent": id_agent,
+        }
+        Agent = schemas.Agent(**data)
+        instance = create_instance_from_Manageable(Agent)
+        instances[agent.ag_name] = instance
+    else:
+        raise HTTPException(status_code=400, detail="ya agregado o error")
 
 
 # elimina agentes
 @app.delete("/agents/delete/{field}")
 def delete_agent(field: models.ModelField, value, db: Session = Depends(get_db)):
-    # instances.pop(field.Hostname)
-    print(instances)
-    return crud.delete_agent(db=db, field=field.name, value=value)
+    ag_name = crud.delete_agent(db=db, field=field.name, value=value)
+    if ag_name:
+        del instances[ag_name]
+
+        raise HTTPException(status_code=200, detail="agente eliminado")
+    else:
+        raise HTTPException(status_code=400, detail="ya eliminado o error")
 
 
 # ---------------------------------------------------------------------------------FEATURES
@@ -190,23 +205,33 @@ async def delete_feature(id: int, nametask: str, db: Session = Depends(get_db)):
 
 # Recupera la iftable del agente en cuestion  (View : Info)
 @app.get("/iftable/{host}", response_model=list[schemas.iftable])
-async def read_agents(host: str):
-    community = "public"
-    salida = await interfaceTable(community, host)
-    return salida
+async def read_agents(host: str): 
+        community = "public"
+        salida = await interfaceTable(community, host)
+        if salida:
+            return salida
+        else:
+            raise HTTPException(status_code=400, detail="No se puede adquirir la iftable")
+
 
 
 # --------------------------------------------------------------------------------HISTORIAL
 
 
 # Obtener el historial segun el sensor (OID)
-@app.post("/history/sensor/", response_model=schemas.responseHistory)
+@app.post("/history/sensor/")
 def read_history_sensor(filter: schemas.getHistory, db: Session = Depends(get_db)):
     if filter.id_sensor == 100:
         return crud.get_history_Network(db=db, filter=filter)
     else:
         return crud.get_history_sensor(db=db, filter=filter)
 
+
+
+@app.post("/history/filter/",response_model=schemas.MainModel| str)
+def read_history_sensor(filter: schemas.filterHistory, db: Session = Depends(get_db)):
+        return crud.get_history_filter(db=db, filter=filter)
+   
 
 # -----------------------------------------------------------------------------------GESTIONABLES
 

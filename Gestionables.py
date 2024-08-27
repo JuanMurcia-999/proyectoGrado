@@ -2,76 +2,78 @@ from pysnmp.smi.rfc1902 import ObjectIdentity, ObjectType
 from slim.slim_get import slim_get
 import asyncio
 from DataBases import schemas
-import json
+import subprocess
 
 
-async def peticion(community, host, port, Num_Interface):
-    ifInOctets = "1.3.6.1.2.1.2.2.1.10"
-    ifOutOctets = "1.3.6.1.2.1.2.2.1.16"
+
+async def ping(ip: str):
+
+    p = subprocess.Popen(
+        ["ping", "-n", "2", "-w", "2", ip],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    p.wait()
+    return True if p.poll() == 0 else False
+
+
+async def peticion(community, ip, port, objects):
     return await slim_get(
         community,
-        host,
-        port,
-        ObjectType(ObjectIdentity(ifInOctets + "." + Num_Interface)),
-        ObjectType(ObjectIdentity(ifOutOctets + "." + Num_Interface)),
+        ip,
+        port,     
+        *objects
     )
 
 
 class AnchoBanda:
-    def __init__(
-        self,
-        host: str,
-        Num_Interface: str,
-        intervalo: int,
-        id_adminis: int,
-        id: int,
-        cola,
-        alarms,
-    ) -> None:
-        self.host = host
-        self.Num_Interface = Num_Interface
-        self.intervalo = int(intervalo)
-        self.id_adminis = id_adminis
-        self.id = id
-        self.cola = cola
-        self.alarms = alarms
+
+    ifInOctets = "1.3.6.1.2.1.2.2.1.10"
+    ifOutOctets = "1.3.6.1.2.1.2.2.1.16"
+
+    def __init__(self, Config: schemas.ConfigAnchoBanda) -> None:
+        self.ip = Config.ip
+        self.Num_Interface = Config.Num_Interface
+        self.intervalo = Config.intervalo 
+        self.id_adminis = Config.id_adminis
+        self.id = Config.id
+        self.cola = Config.history
+        self.alarms = Config.alarms
 
     async def run(self):
-        print(f"Ejecutando run de {self.host}")
+        print(f"Ejecutando run de {self.ip}")
         while True:
             try:
                 community = "public"
                 port = 161
                 InOut1 = []
                 InOut2 = []
+                objects = [
+                    ObjectType(ObjectIdentity(self.ifInOctets + "." + self.Num_Interface)),
+                    ObjectType(ObjectIdentity(self.ifOutOctets + "." + self.Num_Interface))
+                ]
 
-                varbinds = await peticion(
-                    community, self.host, port, self.Num_Interface
-                )
+                varbinds = await peticion(community, self.ip, port,objects)
+
                 for varBind in varbinds:
                     _, value = varBind
                     InOut1.append(int(value))
 
                 await asyncio.sleep(self.intervalo)
 
-                varbinds = await peticion(
-                    community, self.host, port, self.Num_Interface
-                )
+                varbinds = await peticion(community, self.ip, port, objects)
+
                 for varBind in varbinds:
                     _, value = varBind
                     InOut2.append(int(value))
-            #procesamiento de la lectura
+                    
+                # procesamiento de la lectura
                 [difIn, difOut] = InOut2[0] - InOut1[0], InOut2[1] - InOut1[1]
                 [difInbits, difOutbits] = difIn * 8, difOut * 8
                 in_bps = difInbits / self.intervalo
                 out_bps = difOutbits / self.intervalo
 
                 [in_kbps, out_kbps] = in_bps / 1000, out_bps / 1000
-
-                print(
-                    f"Kbps IN: {in_kbps} /// Kbps OUT {out_kbps} ::::: {self.id_adminis}"
-                )
-                datavalue = {"kbps_IN": in_kbps, "kbps_OUT": out_kbps}
 
                 dIn = {
                     "id_agent": self.id,
@@ -87,6 +89,9 @@ class AnchoBanda:
 
                 record1 = schemas.addHistory(**dIn)
                 record2 = schemas.addHistory(**dOut)
+
+
+
                 self.cola.encolar(record1)
                 self.cola.encolar(record2)
                 self.alarms.encolar(record1)
@@ -98,26 +103,21 @@ class AnchoBanda:
 
 
 class Processes:
-    def __init__(
-        self, ip: str, timer: int, id_adminis: int, id: int, cola, alarms
-    ) -> None:
-        self.ip = ip
-        self.timer = timer | 80
-        self.stop_flag = asyncio.Event()
-        self.id_adminis = id_adminis
-        self.id = id
-        self.cola = cola
-        self.alarms = alarms
+    def __init__(self, Config: schemas.ConfigProcesses) -> None:
+        self.ip = Config.ip
+        self.timer = Config.timer | 60
+        self.id_adminis = Config.id_adminis
+        self.id = Config.id
+        self.cola = Config.history
+        self.alarms = Config.alarms
 
     async def TaskNumProcesses(self):
-        while not self.stop_flag.is_set():
+        while True:
             try:
-                varbinds = await slim_get(
-                    "public",
-                    self.ip,
-                    161,
-                    ObjectType(ObjectIdentity("1.3.6.1.2.1.25.1.6.0")),
-                )
+                community="public"
+                port=161
+                objects= [ObjectType(ObjectIdentity("1.3.6.1.2.1.25.1.6.0"))]
+                varbinds = await peticion(community, self.ip, port, objects)
                 _, num_processes = varbinds[0]
                 num_processes = int(num_processes)
 
@@ -140,12 +140,11 @@ class Processes:
     async def TaskMemorySize(self):
         while True:
             try:
-                varbinds = await slim_get(
-                    "public",
-                    self.ip,
-                    161,
-                    ObjectType(ObjectIdentity("1.3.6.1.2.1.25.2.2.0")),
-                )
+                community="public"
+                port=161
+                objects=[ObjectType(ObjectIdentity("1.3.6.1.2.1.25.2.2.0"))]
+                varbinds = await peticion(community, self.ip, port, objects)
+
 
                 _, MemorySize = varbinds[0]
                 MemorySize = int(MemorySize)

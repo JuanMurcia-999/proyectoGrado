@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, func
 import models, schemas
 import json
+from datetime import datetime
+
 
 # Peticion que retorna todos los agentes en la base de datos
 
@@ -14,28 +16,38 @@ def get_all_agent(db: Session):
 
 # Query para creacion de Agents
 def create_agent(db: Session, agent: schemas.CreateAgent):
-    db_agent = models.Agents(
-        ag_name=agent.ag_name, ip_address=agent.ip_address, ag_type=agent.ag_type
-    )
+    try:
+        db_agent = models.Agents(
+            ag_name=agent.ag_name, ip_address=agent.ip_address, ag_type=agent.ag_type
+        )
 
-    db.add(db_agent)
-    db.commit()
-    db.refresh(db_agent)
-    db.close()
-    return db_agent
+        db.add(db_agent)
+        db.commit()
+        db.refresh(db_agent)
+        return db_agent.id_agent
+    except Exception:
+        return False
+    finally:
+        db.close()
 
 
 # Query para eleiminacion de agentes
 def delete_agent(db: Session, field, value):
-    db_agent = (
-        db.query(models.Agents).filter(getattr(models.Agents, field) == value).first()
-    )
-    if db_agent:
-        db.delete(db_agent)
-        db.commit()
+    try:
+        db_agent = (
+            db.query(models.Agents)
+            .filter(getattr(models.Agents, field) == value)
+            .first()
+        )
+        if db_agent:
+            db.delete(db_agent)
+            db.commit()
+            return db_agent.ag_name
+    except Exception:
+        return False
+    finally:
+        print("operacion terminada")
         db.close()
-        return "agente eliminado"
-    return "Este agente ya fue eliminado o no existe"
 
 
 # ------------------------------------------------------------------------------------------------FEATURES
@@ -127,7 +139,7 @@ def get_history_sensor(db: Session, filter: schemas.getHistory):
         column = "id_sensor"
 
     response = db.query(
-        models.History_features.value, models.History_features.date
+        models.History_features.value, models.History_features.time
     ).filter(
         models.History_features.id_adminis == condition,
         models.History_features.id_agent == filter.id_agent,
@@ -140,7 +152,7 @@ def get_history_sensor(db: Session, filter: schemas.getHistory):
 
     name = namesensor[0][0]
     values = [item[0] for item in response]
-    date = [item[1].strftime("%Y-%m-%d") for item in response]
+    date = [item[1].strftime("%H:%M:%S") for item in response]
 
     return {"value": {name: values}, "created_at": date}
 
@@ -149,7 +161,6 @@ def get_history_sensor(db: Session, filter: schemas.getHistory):
 
 
 def get_history_Network(db: Session, filter: schemas.getHistory):
-    print(filter)
     IN = (
         db.query(models.History_features.value, models.History_features.date)
         .filter(
@@ -174,6 +185,99 @@ def get_history_Network(db: Session, filter: schemas.getHistory):
     return {"value": {"valuesIN": valuesIN, "valuesOUT": valuesOUT}, "created_at": date}
 
 
+
+
+######################################   FILTRADO DE DATOS
+def get_history_filter(db: Session, filter: schemas.filterHistory):
+    # fecha_objeto = datetime.strptime(filter.datebase, "%m/%d/%Y")
+    # DateForm = fecha_objeto.strftime("%Y-%m-%d")
+    if filter.id_sensor is None:
+        condition = filter.id_adminis
+        column = "id_adminis"
+    else:
+        condition = filter.id_sensor
+        column = "id_sensor"
+
+    try:
+        HistoryFeature = models.History_features
+        response = (
+            db.query(HistoryFeature.value, HistoryFeature.time, HistoryFeature.date)
+            .filter(
+                and_(
+                    HistoryFeature.id_agent == filter.id_agent,
+                    HistoryFeature.id_adminis == condition,
+                    HistoryFeature.date >= func.date(filter.datebase, filter.daterange),
+                    HistoryFeature.time >= func.time(filter.datebase, filter.timerange),
+                )
+            )
+            .order_by(HistoryFeature.date.asc())
+            .limit(filter.limit)
+            .offset(filter.offset)
+            .all()
+        )
+
+        namesensor = (
+            db.query(models.Administered_features.adminis_name)
+            .filter(getattr(models.Administered_features, column) == condition)
+            .first()
+        )
+
+        if response:
+
+            name = namesensor.adminis_name
+            values = [item.value for item in response]
+            time = [item.time.strftime("%H:%M:%S") for item in response]
+            date = [item.date.strftime("%Y-%m-%d") for item in response]
+
+            minimum = min(values)
+            maximus = max(values)
+            average = sum(values) / len(values)
+
+            response_json = {
+                "data": {
+                    "datagrafic": [
+                        {
+                            "name": name,
+                            "values": values,
+                            "date": date,
+                            "time": time,
+                            "stadistics": {
+                                "min": minimum,
+                                "max": maximus,
+                                "avg": average,
+                            },
+                        }
+                    ],
+                },
+            }
+
+            return response_json
+        else:
+            return {
+                "data": {
+                    "datagrafic": [
+                        {
+                            "name": 'Sin datos',
+                            "values": [],
+                            "date": [],
+                            "time": [],
+                            "stadistics": {
+                                "min": 0,
+                                "max": 0,
+                                "avg": 0,
+                            },
+                        }
+                    ],
+                },
+            }
+
+    except Exception:
+        return False
+    finally:
+        db.close()
+
+
+####################################################################################
 # Agregar un nuevo registro al historial
 def add_history(db: Session, record: schemas.addHistory):
 

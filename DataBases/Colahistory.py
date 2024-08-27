@@ -40,7 +40,7 @@ class HistoryFIFO:
 
     def procesar_tareas(self):
         while not self.esta_vacia():
-            # print(f'Longitud:::  {len(self.cola)}')
+            print(f'Longitud:::  {len(self.cola)}')
             tarea = self.desencolar()
             # print(f"Procesando tarea: {tarea}")
             exito = self.add_history(tarea)
