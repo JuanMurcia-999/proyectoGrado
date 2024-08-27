@@ -134,7 +134,7 @@ def read_agents(db: Session = Depends(get_db)):
     return crud.get_all_agent(db=db)
 
 
-# crea agentes
+# Agregar agente
 @app.post("/agents/create/")
 def create_agent(agent: schemas.CreateAgent, db: Session = Depends(get_db)):
     id_agent = crud.create_agent(db=db, agent=agent)
@@ -146,6 +146,7 @@ def create_agent(agent: schemas.CreateAgent, db: Session = Depends(get_db)):
             "id_agent": id_agent,
         }
         Agent = schemas.Agent(**data)
+        print(Agent)
         instance = create_instance_from_Manageable(Agent)
         instances[agent.ag_name] = instance
     else:
