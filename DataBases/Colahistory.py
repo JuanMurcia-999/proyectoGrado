@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 import models
 
 
-DATABASE_URL = "sqlite:///productos.sqlite" 
+DATABASE_URL = "sqlite:///productos.sqlite"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
@@ -40,12 +40,13 @@ class HistoryFIFO:
 
     def procesar_tareas(self):
         while not self.esta_vacia():
-            print(f'Longitud:::  {len(self.cola)}')
+            # print(f"Longitud:::  {len(self.cola)}")
             tarea = self.desencolar()
             # print(f"Procesando tarea: {tarea}")
             exito = self.add_history(tarea)
             if exito:
-                print(f"Tarea completada con éxito.")
+                continue
+                # print(f"Tarea completada con éxito.")
             else:
                 print(f"Tarea falló. Reintentando...")
                 self.encolar(tarea)  # Volver a encolar la tarea para reintentar

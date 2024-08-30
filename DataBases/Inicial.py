@@ -5,15 +5,14 @@ import asyncio
 # Añade el directorio raíz al sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from pysnmp.proto import rfc1902
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from pysnmp.smi.rfc1902 import ObjectIdentity, ObjectType
-from slim.slim_get import slim_get
+
 from slim.slim_bulk import get_bulk
 import models
 import asyncio
-from datetime import datetime
 
 
 # Configuración de la base de datos
@@ -127,7 +126,7 @@ async def CreatorTask(elements):
 
 # async def Inicial():
 #     print("Tarea ")
-    # await Totalagentes()
+# await Totalagentes()
 
 
 # asyncio.run(Inicial()

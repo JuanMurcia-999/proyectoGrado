@@ -13,6 +13,7 @@ import models
 import schemas
 from Colahistory import HistoryFIFO
 from ColaAlarms import AlarmsFIFO
+from Gestionables import Ping
 
 # Configuración de la base de datos
 DATABASE_URL = "sqlite:///productos.sqlite"
@@ -22,6 +23,8 @@ db = SessionLocal()
 
 colaoid = HistoryFIFO()
 alarm = AlarmsFIFO()
+
+Af = models.Administered_features
 
 
 async def Totalagentes(id_agent: int, ip_agent: str):
@@ -34,11 +37,11 @@ async def Totalagentes(id_agent: int, ip_agent: str):
 
         intervalos = (
             db.query(
-                models.Administered_features.timer,
+                Af.timer,
             )
             .filter(
-                models.Administered_features.id_agent == id_agent,
-                models.Administered_features.oid != "",
+                Af.id_agent == id_agent,
+                Af.oid != "",
             )
             .distinct()
             .all()
@@ -48,13 +51,13 @@ async def Totalagentes(id_agent: int, ip_agent: str):
             TIMES.append(inter.timer)
             features = (
                 db.query(
-                    models.Administered_features.oid,
-                    models.Administered_features.id_adminis,
+                    Af.oid,
+                    Af.id_adminis,
                 )
                 .filter(
-                    models.Administered_features.timer == f"{inter.timer}",
-                    models.Administered_features.id_agent == id_agent,
-                    models.Administered_features.oid != "",
+                    Af.timer == f"{inter.timer}",
+                    Af.id_agent == id_agent,
+                    Af.oid != "",
                 )
                 .all()
             )
@@ -69,45 +72,47 @@ async def Totalagentes(id_agent: int, ip_agent: str):
         db.close()
 
 
-async def Get_SNMP(task: schemas.taskoid, statedevice):
+async def Get_SNMP(task: schemas.taskoid):
     while True:
-        satate = await statedevice()
-        if satate:
-            try:
-                await asyncio.sleep(task.TIME)
+
+        try:
+            satate =await Ping().getstate(task.ID)
+            if satate:
+                # print("es verdad y aqui me quedo")
+                # await asyncio.sleep(task.TIME)
                 varbinds = await slim_get("public", task.IP, 161, *task.OIDS)
+                if varbinds:
+                    for cosa, id in zip(varbinds, task.IDF):
+                        _, value = cosa
+                        # print(f"{value}:::::: {id}")
 
-                for cosa, id in zip(varbinds, task.IDF):
-                    _, value = cosa
-                    # print(f'{value}:::::: {id}')
+                        datos = {
+                            "id_agent": task.ID,
+                            "id_adminis": id,
+                            "value": round(float(value), 3),
+                        }
 
-                    datos = {
-                        "id_agent": task.ID,
-                        "id_adminis": id,
-                        "value": round(float(value), 3),
-                    }
-
-                    record = schemas.addHistory(**datos)
-                    colaoid.encolar(record)
-                    alarm.encolar(record)
-            except Exception:
-                continue
-        else:
-            continue
+                        record = schemas.addHistory(**datos)
+                        colaoid.encolar(record)
+                        alarm.encolar(record)
+        except Exception:
+            return
+        finally:
+            await asyncio.sleep(task.TIME)
 
 
 class sensorOID:
-    def __init__(self, ip: str, id: int, funcState) -> None:
+    def __init__(self, ip: str, id: int) -> None:
         self.ip = ip
         self.id = id
-        self.statedevice = funcState
         self.tasks = []
 
     async def CreatorTask(self):
+        await asyncio.sleep(2)
         for task in self.tasks:
             task.cancel()
         elements = await Totalagentes(self.id, self.ip)
-        print(elements)
+        # print(elements)
 
         for TIME, OIDS, IDF in zip(elements.TIMES, elements.OIDS, elements.IDF):
             oid = [ObjectType(ObjectIdentity(f"{oid}")) for oid in OIDS]
@@ -122,8 +127,7 @@ class sensorOID:
                                 "IDF": IDF,
                                 "IP": elements.IP,
                             }
-                        ),
-                        statedevice=self.statedevice,
+                        )
                     )
                 )
             )

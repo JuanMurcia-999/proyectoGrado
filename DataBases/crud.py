@@ -5,19 +5,25 @@ import json
 from datetime import datetime
 
 
+Ag = models.Agents
+Af = models.Administered_features
+Ad = models.Active_default
+Hf = models.History_features
+Df =models.Default_features
+Al = models.Alarms
 # Peticion que retorna todos los agentes en la base de datos
 
 # -------------------------------------------------------------------------------------------AGENTS
 
 
 def get_all_agent(db: Session):
-    return db.query(models.Agents).options(joinedload(models.Agents.type)).all()
+    return db.query(Ag).options(joinedload(Ag.type)).all()
 
 
 # Query para creacion de Agents
 def create_agent(db: Session, agent: schemas.CreateAgent):
     try:
-        db_agent = models.Agents(
+        db_agent = Ag(
             ag_name=agent.ag_name, ip_address=agent.ip_address, ag_type=agent.ag_type
         )
 
@@ -35,14 +41,14 @@ def create_agent(db: Session, agent: schemas.CreateAgent):
 def delete_agent(db: Session, field, value):
     try:
         db_agent = (
-            db.query(models.Agents)
-            .filter(getattr(models.Agents, field) == value)
+            db.query(Ag)
+            .filter(getattr(Ag, field) == value)
             .first()
         )
         if db_agent:
             db.delete(db_agent)
             db.commit()
-            return db_agent.ag_name
+            return db_agent
     except Exception:
         return False
     finally:
@@ -56,8 +62,8 @@ def delete_agent(db: Session, field, value):
 # Query para obtener todas las caracteristicas que son monitoreadas
 def get_all_features(db: Session):
     return (
-        db.query(models.Administered_features)
-        .options(joinedload(models.Administered_features.agent))
+        db.query(Af)
+        .options(joinedload(Af.agent))
         .all()
     )
 
@@ -65,16 +71,16 @@ def get_all_features(db: Session):
 # Query para obtener todas las caracteristicas segun agente
 def get_all_features_agent(db: Session, value):
     return (
-        db.query(models.Administered_features)
-        .filter(models.Administered_features.id_agent == value)
-        .options(joinedload(models.Administered_features.agent))
+        db.query(Af)
+        .filter(Af.id_agent == value)
+        .options(joinedload(Af.agent))
     )
 
 
 # Agregar una nueva feature a monitorizar
 def new_feature(db: Session, feature: schemas.new_features):
     try:
-        db_agent = models.Administered_features(
+        db_agent = Af(
             id_adminis=feature.id_adminis,
             id_sensor=feature.id_sensor,
             id_agent=feature.id_agent,
@@ -96,8 +102,8 @@ def new_feature(db: Session, feature: schemas.new_features):
 # Query para eleiminacion de features
 def delete_feature(db: Session, id):
     db_agent = (
-        db.query(models.Administered_features)
-        .filter(models.Administered_features.id_adminis == id)
+        db.query(Af)
+        .filter(Af.id_adminis == id)
         .first()
     )
     if db_agent:
@@ -109,11 +115,11 @@ def delete_feature(db: Session, id):
 
 def delete_active_default(db: Session, dates: schemas.Manageable):
     db_active = (
-        db.query(models.Active_default)
+        db.query(Ad)
         .filter(
             and_(
-                models.Active_default.id_feature == dates.id_feature,
-                models.Active_default.id_agent == dates.id_agent,
+                Ad.id_feature == dates.id_feature,
+                Ad.id_agent == dates.id_agent,
             )
         )
         .first()
@@ -128,7 +134,7 @@ def delete_active_default(db: Session, dates: schemas.Manageable):
 
 
 # ---------------------------------------------------------------------------------------------HISTORY
-# getattr(models.Agents,field) == value
+
 def get_history_sensor(db: Session, filter: schemas.getHistory):
 
     if filter.id_sensor is None:
@@ -139,14 +145,14 @@ def get_history_sensor(db: Session, filter: schemas.getHistory):
         column = "id_sensor"
 
     response = db.query(
-        models.History_features.value, models.History_features.time
+        Hf.value, Hf.time
     ).filter(
-        models.History_features.id_adminis == condition,
-        models.History_features.id_agent == filter.id_agent,
+        Hf.id_adminis == condition,
+        Hf.id_agent == filter.id_agent,
     )
     namesensor = (
-        db.query(models.Administered_features.adminis_name)
-        .filter(getattr(models.Administered_features, column) == condition)
+        db.query(Af.adminis_name)
+        .filter(getattr(Af, column) == condition)
         .all()
     )
 
@@ -162,20 +168,20 @@ def get_history_sensor(db: Session, filter: schemas.getHistory):
 
 def get_history_Network(db: Session, filter: schemas.getHistory):
     IN = (
-        db.query(models.History_features.value, models.History_features.date)
+        db.query(Hf.value, Hf.date)
         .filter(
-            models.History_features.id_adminis == 1001,
-            models.History_features.id_agent == filter.id_agent,
+            Hf.id_adminis == 1001,
+            Hf.id_agent == filter.id_agent,
         )
-        .order_by(models.History_features.id_register.desc())
+        .order_by(Hf.id_register.desc())
     )
     OUT = (
-        db.query(models.History_features.value, models.History_features.date)
+        db.query(Hf.value, Hf.date)
         .filter(
-            models.History_features.id_adminis == 1002,
-            models.History_features.id_agent == filter.id_agent,
+            Hf.id_adminis == 1002,
+            Hf.id_agent == filter.id_agent,
         )
-        .order_by(models.History_features.id_register.desc())
+        .order_by(Hf.id_register.desc())
     )
 
     valuesIN = [item[0] for item in IN]
@@ -189,8 +195,7 @@ def get_history_Network(db: Session, filter: schemas.getHistory):
 
 ######################################   FILTRADO DE DATOS
 def get_history_filter(db: Session, filter: schemas.filterHistory):
-    # fecha_objeto = datetime.strptime(filter.datebase, "%m/%d/%Y")
-    # DateForm = fecha_objeto.strftime("%Y-%m-%d")
+
     if filter.id_sensor is None:
         condition = filter.id_adminis
         column = "id_adminis"
@@ -198,27 +203,28 @@ def get_history_filter(db: Session, filter: schemas.filterHistory):
         condition = filter.id_sensor
         column = "id_sensor"
 
+ 
+   
     try:
-        HistoryFeature = models.History_features
         response = (
-            db.query(HistoryFeature.value, HistoryFeature.time, HistoryFeature.date)
+            db.query(Hf.value, Hf.time, Hf.date)
             .filter(
                 and_(
-                    HistoryFeature.id_agent == filter.id_agent,
-                    HistoryFeature.id_adminis == condition,
-                    HistoryFeature.date >= func.date(filter.datebase, filter.daterange),
-                    HistoryFeature.time >= func.time(filter.datebase, filter.timerange),
+                    Hf.id_agent == filter.id_agent,
+                    Hf.id_adminis == condition,
+                    Hf.date >= func.date(filter.datebase, filter.daterange),
+                    Hf.time >= func.time('now', filter.timerange),
                 )
             )
-            .order_by(HistoryFeature.date.asc())
+            .order_by(Hf.date.asc())
             .limit(filter.limit)
             .offset(filter.offset)
             .all()
         )
 
         namesensor = (
-            db.query(models.Administered_features.adminis_name)
-            .filter(getattr(models.Administered_features, column) == condition)
+            db.query(Af.adminis_name)
+            .filter(getattr(Af, column) == condition)
             .first()
         )
 
@@ -281,7 +287,7 @@ def get_history_filter(db: Session, filter: schemas.filterHistory):
 # Agregar un nuevo registro al historial
 def add_history(db: Session, record: schemas.addHistory):
 
-    db_history = models.History_features(
+    db_history = Hf(
         id_agent=record.id_agent, id_adminis=record.id_adminis, value=record.value
     )
 
@@ -297,19 +303,19 @@ def add_history(db: Session, record: schemas.addHistory):
 
 def get_default_features_agent(db: Session, id, type):
     return (
-        db.query(models.Default_features.fe_name, models.Default_features.id_feature)
+        db.query(Df.fe_name, Df.id_feature)
         .outerjoin(
-            models.Active_default,
+            Ad,
             and_(
-                models.Default_features.id_feature == models.Active_default.id_feature,
-                models.Active_default.id_agent == id,
+                Df.id_feature == Ad.id_feature,
+                Ad.id_agent == id,
             ),
         )
         .filter(
             and_(
-                models.Active_default.id_feature.is_(None),
-                models.Default_features.id_type.in_([1, type]),
-                models.Default_features.id_feature != 100,
+                Ad.id_feature.is_(None),
+                Df.id_type.in_([1, type]),
+                Df.id_feature != 100,
             )
         )
     )
@@ -317,16 +323,16 @@ def get_default_features_agent(db: Session, id, type):
 
 def get_active_default(db: Session, id, type):
     return (
-        db.query(models.Default_features.fe_name, models.Default_features.id_feature)
+        db.query(Df.fe_name, Df.id_feature)
         .join(
-            models.Active_default,
-            models.Default_features.id_feature == models.Active_default.id_feature,
+            Ad,
+            Df.id_feature == Ad.id_feature,
         )
         .filter(
             and_(
-                models.Active_default.id_agent == id,
-                models.Default_features.id_type.in_([1, type]),
-                models.Active_default.id_feature != 100,
+                Ad.id_agent == id,
+                Df.id_type.in_([1, type]),
+                Ad.id_feature != 100,
             )
         )
     )
@@ -334,7 +340,7 @@ def get_active_default(db: Session, id, type):
 
 def add_active_default(db: Session, dates: schemas.Manageable):
     params_json = json.dumps(dates.params)
-    addactive = models.Active_default(
+    addactive = Ad(
         id_feature=dates.id_feature, id_agent=dates.id_agent, params=params_json
     )
 
@@ -349,11 +355,11 @@ def delete_feature_two(db: Session, name, id):
     print(name)
     print(id)
     db_feature = (
-        db.query(models.Administered_features)
+        db.query(Af)
         .filter(
             and_(
-                models.Administered_features.adminis_name.like(f"{name}%"),
-                models.Administered_features.id_agent == id,
+                Af.adminis_name.like(f"{name}%"),
+                Af.id_agent == id,
             )
         )
         .all()
@@ -370,14 +376,14 @@ def delete_feature_two(db: Session, name, id):
 # ------------------------------------------------------------------------------------ ALARMAS
 def get_alarm(db: Session, id_agent):
     try:
-        return db.query(models.Alarms).filter(models.Alarms.id_agent == id_agent).all()
+        return db.query(Al).filter(Al.id_agent == id_agent).all()
     except Exception:
         return False
 
 
 def delete_alarm(db: Session, id_alarm):
     db_alarm = (
-        db.query(models.Alarms).filter(models.Alarms.id_alarm == id_alarm).first()
+        db.query(Al).filter(Al.id_alarm == id_alarm).first()
     )
 
     if db_alarm:
@@ -390,7 +396,7 @@ def delete_alarm(db: Session, id_alarm):
 
 def add_alarm(db: Session, alarm: schemas.newAlarm):
     try:
-        addalarm = models.Alarms(
+        addalarm = Al(
             id_agent=alarm.id_agent,
             id_adminis=alarm.id_adminis,
             id_sensor=alarm.id_sensor,

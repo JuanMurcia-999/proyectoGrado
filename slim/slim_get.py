@@ -10,13 +10,8 @@ async def slim_get(community, host, port, *VarBinds):
             #.addMibSource('C:/Users/User/Desktop/Proyecto de grado/Librerias/PySNMP6.1/mibs-compiler/') 
          )
         if errorIndication:
-            print(errorIndication)
+            return
         elif errorStatus:
-            print(
-                "{} at {}".format(
-                    errorStatus.prettyPrint(),
-                    errorIndex and varBinds[int(errorIndex) - 1][0] or "?",
-                )
-            )
+            return
         else:
             return varBinds

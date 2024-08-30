@@ -1,6 +1,7 @@
 import sys
 import os
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 # Añade el directorio raíz al sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -16,8 +17,9 @@ from contextlib import asynccontextmanager
 from sqlalchemy.orm import Session
 import crud, models, schemas
 from database import SessionLocal, engine
-from Manageable import ManageablePC, ManageableRT
-from typing import List, Dict
+from Manageable import *
+from Abstracciones import *
+from Gestionables import Ping
 
 import json
 from Colahistory import HistoryFIFO
@@ -32,6 +34,7 @@ alarms = AlarmsFIFO()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await create_instance_startup()
+    asyncio.create_task(Ping().Exectping())
     yield
 
 
@@ -58,7 +61,7 @@ app.add_middleware(
 #     return response
 
 
-instances = {} 
+instances = {}
 
 
 def get_db():
@@ -72,10 +75,11 @@ def get_db():
 async def create_instance_startup():
     agents = crud.get_all_agent(db=SessionLocal())
     for agent in agents:
-        instance = create_instance_from_Manageable(agent)
+    
+        instance = await create_instance_from_Manageable(agent)
         instances[agent.ag_name] = instance
         await instance.task_oid()
-        await instance.state_device()
+        await Ping().addagent(agent.id_agent,agent.ip_address)
         sensors = (
             SessionLocal()
             .query(models.Active_default)
@@ -90,24 +94,39 @@ async def create_instance_startup():
             )
 
 
-def create_instance_from_Manageable(request: schemas.Agent):
+async def create_instance_from_Manageable(request: schemas.Agent):
+    await Ping().addagent(request.id_agent, request.ip_address)
     if request.ag_type == 2:
         return ManageablePC(request.ip_address, request.ag_name, request.id_agent)
     elif request.ag_type == 3:
         return ManageableRT(request.ip_address, request.ag_name, request.id_agent)
-
+    elif request.ag_type == 4:
+        return ManageableMixto(request.ip_address, request.ag_name, request.id_agent)
+    
 
 async def activator_tasks(name: str, nametask: str, params):
     instance = instances.get(name)
     if not instance:
         raise HTTPException(status_code=404, detail="Instance not found")
 
-    task_mapping = {
-        "NumProccesses": instance.NumProccesses,
-        "MemorySize": instance.MemorySize,
-        "Networktraffic": instance.Networktraffic,
-    }
+    if isinstance(instance, ManageableMixto):
+        task_mapping = {
+            "NumProccesses": instance.NumProccesses,
+            "MemorySize": instance.MemorySize,
+            "Networktraffic": instance.Networktraffic,
+            "Networktraffic": instance.Networktraffic,
+            "MemoryUsed": instance.MemoryUsed,
+            "CpuUsed": instance.CpuUsed,
+            "DiskUsed": instance.DiskUsed,
+        }
 
+    elif isinstance(instance, (ManageablePC, ManageableRT)):
+        task_mapping = {
+            "NumProccesses": instance.NumProccesses,
+            "MemorySize": instance.MemorySize,
+            "Networktraffic": instance.Networktraffic,
+            "Networktraffic": instance.Networktraffic,
+        }
     task_func = task_mapping.get(nametask)
     if not task_func:
         print(f"Tarea no encontrada: {nametask}")
@@ -115,7 +134,14 @@ async def activator_tasks(name: str, nametask: str, params):
     try:
         # Asumiendo que todas las tareas manejan parámetros similares
         params = params
-        if nametask in ["NumProccesses", "MemorySize", "Networktraffic"]:
+        if nametask in [
+            "NumProccesses",
+            "MemorySize",
+            "Networktraffic",
+            "MemoryUsed",
+            "CpuUsed",
+            "DiskUsed",
+        ]:
             await task_func(params, nametask, cola, alarms)
             return True
         else:
@@ -136,7 +162,7 @@ def read_agents(db: Session = Depends(get_db)):
 
 # Agregar agente
 @app.post("/agents/create/")
-def create_agent(agent: schemas.CreateAgent, db: Session = Depends(get_db)):
+async def create_agent(agent: schemas.CreateAgent, db: Session = Depends(get_db)):
     id_agent = crud.create_agent(db=db, agent=agent)
     if id_agent:
         data = {
@@ -147,7 +173,7 @@ def create_agent(agent: schemas.CreateAgent, db: Session = Depends(get_db)):
         }
         Agent = schemas.Agent(**data)
         print(Agent)
-        instance = create_instance_from_Manageable(Agent)
+        instance = await create_instance_from_Manageable(Agent)
         instances[agent.ag_name] = instance
     else:
         raise HTTPException(status_code=400, detail="ya agregado o error")
@@ -155,11 +181,11 @@ def create_agent(agent: schemas.CreateAgent, db: Session = Depends(get_db)):
 
 # elimina agentes
 @app.delete("/agents/delete/{field}")
-def delete_agent(field: models.ModelField, value, db: Session = Depends(get_db)):
-    ag_name = crud.delete_agent(db=db, field=field.name, value=value)
-    if ag_name:
-        del instances[ag_name]
-
+async def delete_agent(field: models.ModelField, value, db: Session = Depends(get_db)):
+    db_agent = crud.delete_agent(db=db, field=field.name, value=value)
+    if db_agent:
+        del instances[db_agent.ag_name]
+        await Ping().deleteagent(db_agent.id_agent)
         raise HTTPException(status_code=200, detail="agente eliminado")
     else:
         raise HTTPException(status_code=400, detail="ya eliminado o error")
@@ -206,14 +232,13 @@ async def delete_feature(id: int, nametask: str, db: Session = Depends(get_db)):
 
 # Recupera la iftable del agente en cuestion  (View : Info)
 @app.get("/iftable/{host}", response_model=list[schemas.iftable])
-async def read_agents(host: str): 
-        community = "public"
-        salida = await interfaceTable(community, host)
-        if salida:
-            return salida
-        else:
-            raise HTTPException(status_code=400, detail="No se puede adquirir la iftable")
-
+async def read_agents(host: str):
+    community = "public"
+    salida = await interfaceTable(community, host)
+    if salida:
+        return salida
+    else:
+        raise HTTPException(status_code=400, detail="No se puede adquirir la iftable")
 
 
 # --------------------------------------------------------------------------------HISTORIAL
@@ -228,11 +253,16 @@ def read_history_sensor(filter: schemas.getHistory, db: Session = Depends(get_db
         return crud.get_history_sensor(db=db, filter=filter)
 
 
-
-@app.post("/history/filter/",response_model=schemas.MainModel| str)
-def read_history_sensor(filter: schemas.filterHistory, db: Session = Depends(get_db)):
+@app.post("/history/filter/")
+async def read_history_sensor(filter: schemas.filterHistory, db: Session = Depends(get_db)):
+    if filter.id_sensor == 105:
+        dato = f"{filter.id_sensor}{filter.id_agent}"
+        return await Abtraciones().CPU(dato,filter)
+    elif str(filter.id_sensor).startswith('100'):
+        return await Abtraciones().NETWORK(filter)
+    else:
         return crud.get_history_filter(db=db, filter=filter)
-   
+
 
 # -----------------------------------------------------------------------------------GESTIONABLES
 

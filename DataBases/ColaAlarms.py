@@ -59,7 +59,7 @@ class AlarmsFIFO:
                 message = f"ALARMA ACTIVA \n Sensor : {query.adminis_name} \n "
                 sendmessage(message)
             else:
-                print(f"Alarm sin cumplir")
+                continue
 
     def check_alarm(self, data):
         try:

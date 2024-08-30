@@ -147,16 +147,17 @@ class statistics(BaseModel):
 class DataModel(BaseModel):
     datagrafic: list[Any]
 
+
 class MainModel(BaseModel):
     data: DataModel
 
 
 class filterHistory(BaseModel):
-    id_agent: int |Any
-    id_adminis: int|Any
+    id_agent: int | Any
+    id_adminis: int | Any
     id_sensor: int | Any
     datebase: str | Any
-    timebase: str  | Any
+    timebase: str | Any
     daterange: str | Any
     timerange: str | Any
     limit: int | Any

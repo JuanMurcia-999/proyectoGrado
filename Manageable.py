@@ -1,5 +1,5 @@
 import asyncio
-from Gestionables import AnchoBanda,Processes, ping
+from Gestionables import AnchoBanda,Processes
 from DataBases.taskoid import sensorOID
 from DataBases import schemas
 
@@ -10,7 +10,6 @@ class ManageableGeneral:
         self.name = name
         self.ip = ip
         self.id = id
-        self.state = False
     
     async def Networktraffic(self, params,nametask,cola,alarms) -> None:
         taskname = nametask+params['num_interface']
@@ -33,7 +32,7 @@ class ManageableGeneral:
         await self.instanceoid.CreatorTask()
 
     async def task_oid(self):
-         self.instanceoid = sensorOID(self.ip, self.id, self.state_device)
+         self.instanceoid = sensorOID(self.ip, self.id)
          await self.instanceoid.CreatorTask()
 
 
@@ -58,16 +57,6 @@ class ManageableGeneral:
         except asyncio.CancelledError:
             # La tarea fue cancelada, capturamos la excepción
             print(f'Tarea cancelada: {task}')
-
-
-
-
-    async def state_device(self):
-        #self.state = await ping(self.ip)
-        
-        #print(f'agente {self.name} Activo: {self.state}')
-        return True
-
 
 
 
@@ -111,11 +100,6 @@ class ManageablePC(ManageableGeneral):
               print(f'Error en la descripción: {e}')
 
 
-
-
-
-
-
 class ManageableRT(ManageableGeneral):
     def __init__(self, ip: str, name: str,id:int) -> None:
         super().__init__(ip, name,id)
@@ -129,3 +113,55 @@ class ManageableRT(ManageableGeneral):
     async def task_oid(self):
          self.instanceoid = sensorOID(self.ip, self.id, self.state_device)
          await self.instanceoid.CreatorTask()
+
+
+class ManageableMixto(ManageablePC):
+
+    def __init__(self, ip: str, name: str,id:int) -> None:
+        super().__init__(ip, name,id)
+        self.tasks = {}
+        self.taskoid=[]
+        self.id= id
+        self.instanceoid = sensorOID
+        self.instance = None
+
+    async def MemoryUsed(self, params, task_id,cola,alarms):
+        try:
+            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id, "history":cola, "alarms":alarms}
+            Config = schemas.ConfigProcesses(**Config)
+            task = asyncio.create_task(
+                Processes(Config=Config).TaskMemoryUsed()
+            )
+            if self.tasks is not None:
+                self.tasks[task_id] = task
+            print(self.tasks)
+        except Exception as e:
+                print(f'Error en la descripción: {e}')
+
+
+    async def CpuUsed(self, params, task_id,cola,alarms):
+        try:
+            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id, "history":cola, "alarms":alarms}
+            Config = schemas.ConfigProcesses(**Config)
+            task = asyncio.create_task(
+                Processes(Config=Config).TaskCpuUsed()
+            )
+            if self.tasks is not None:
+                self.tasks[task_id] = task
+            print(self.tasks)
+        except Exception as e:
+                print(f'Error en la descripción: {e}')
+
+
+    async def DiskUsed(self, params, task_id,cola,alarms):
+        try:
+            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id, "history":cola, "alarms":alarms}
+            Config = schemas.ConfigProcesses(**Config)
+            task = asyncio.create_task(
+                Processes(Config=Config).TaskDiskUsed()
+            )
+            if self.tasks is not None:
+                self.tasks[task_id] = task
+            print(self.tasks)
+        except Exception as e:
+                print(f'Error en la descripción: {e}')
