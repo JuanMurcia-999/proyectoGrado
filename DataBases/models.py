@@ -8,6 +8,7 @@ from sqlalchemy import (
     Text,
     Numeric,
     Float,
+    DateTime
 )
 from sqlalchemy.orm import relationship
 from database import Base
@@ -103,6 +104,7 @@ class History_features(Base):
     value = Column(Float, nullable=False)
     date = Column(Date, server_default=func.current_date())
     time = Column(Time, server_default=func.current_time())
+    # date_time = Column(DateTime(timezone=True), server_default=func.localtimestamp())
 
     agent = relationship("Agents")
     feature = relationship("Administered_features")

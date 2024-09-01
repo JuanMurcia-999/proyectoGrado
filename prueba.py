@@ -1,14 +1,18 @@
 import psutil
 
-def memoria_ram_usada():
-    # Obtiene la información de la memoria
-    memoria = psutil.virtual_memory()
+def get_memory_usage():
+    # Obtener información de la memoria
+    memory_info = psutil.virtual_memory()
+    
+    # Extraer la cantidad de memoria en uso
+    used_memory = memory_info.used
+    total_memory = memory_info.total
+    used_memory_percent = memory_info.percent
 
-    # Muestra la memoria total, la utilizada y la disponible
-    print(f"Memoria total: {memoria.total / (1024 ** 2):.2f} MB")
-    print(f"Memoria utilizada: {round(memoria.used / (1024 ** 2))} MB")
-    print(f"Memoria disponible: {memoria.available / (1024 ** 2):.2f} MB")
-    print(f"Porcentaje de memoria utilizada: {memoria.percent}%")
+    return used_memory, total_memory, used_memory_percent
 
-# Llama a la función
-memoria_ram_usada()
+if __name__ == "__main__":
+    used, total, percent = get_memory_usage()
+    print(f"Memoria en uso: {used / (1024 ** 2):.2f} MB")
+    print(f"Memoria total: {total / (1024 ** 2):.2f} MB")
+    print(f"Porcentaje de memoria en uso: {percent}%")

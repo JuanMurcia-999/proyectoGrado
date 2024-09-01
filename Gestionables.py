@@ -42,7 +42,8 @@ class Ping:
         print(self.agentes)
 
     async def getstate(self, id):
-        return self.states.get(id)
+        # return self.states.get(id)
+        return True
 
     async def deleteagent(self, id):
         self.agentes.pop(id)
@@ -105,7 +106,7 @@ class AnchoBanda:
                         in_bps = difInbits / self.intervalo
                         out_bps = difOutbits / self.intervalo
 
-                        [in_kbps, out_kbps] = in_bps / 1000, out_bps / 1000
+                        [in_kbps, out_kbps] = in_bps / 1000000, out_bps / 1000000
 
                         dIn = {
                             "id_agent": self.id,
@@ -121,18 +122,18 @@ class AnchoBanda:
 
                         record1 = schemas.addHistory(**dIn)
                         record2 = schemas.addHistory(**dOut)
-                        print('Interfaces')
                         self.cola.encolar(record1)
                         self.cola.encolar(record2)
                         self.alarms.encolar(record1)
                         self.alarms.encolar(record2)
 
-            except asyncio.CancelledError:
-                return
+            except (asyncio.CancelledError,KeyboardInterrupt):
+                print('fallo en Network')
+                break
             finally:
                 try:
                     await asyncio.sleep(1)
-                except asyncio.CancelledError:
+                except (asyncio.CancelledError,KeyboardInterrupt):
                     break
 
 
@@ -140,7 +141,7 @@ class AnchoBanda:
 class Processes:
     def __init__(self, Config: schemas.ConfigProcesses) -> None:
         self.ip = Config.ip
-        self.timer = Config.timer | 20
+        self.timer = Config.timer | 60
         self.id_adminis = Config.id_adminis
         self.id = Config.id
         self.cola = Config.history
@@ -170,12 +171,13 @@ class Processes:
                         record = schemas.addHistory(**datos)
                         self.cola.encolar(record)
                         self.alarms.encolar(record)
-            except asyncio.CancelledError:
+            except (asyncio.CancelledError,KeyboardInterrupt):
+                print('fallo en TaskNumprocess')
                 break
             finally:
                 try:
                     await asyncio.sleep(self.timer)
-                except asyncio.CancelledError:
+                except(asyncio.CancelledError,KeyboardInterrupt):
                     break
 
     async def TaskMemorySize(self):
@@ -201,12 +203,13 @@ class Processes:
                         self.cola.encolar(record)
                         self.alarms.encolar(record)
 
-            except asyncio.CancelledError:
+            except (asyncio.CancelledError,KeyboardInterrupt):
+                print('fallo en taskMemorysize')
                 break
             finally:
                 try:
                     await asyncio.sleep(self.timer)
-                except asyncio.CancelledError:
+                except (asyncio.CancelledError,KeyboardInterrupt):
                     break
 
     async def TaskMemoryUsed(self):
@@ -232,12 +235,13 @@ class Processes:
                         self.cola.encolar(record)
                         self.alarms.encolar(record)
 
-            except asyncio.CancelledError:
+            except (asyncio.CancelledError,KeyboardInterrupt):
+                print('fallo en taskMemoryUsed')
                 break
             finally:
                 try:
                     await asyncio.sleep(self.timer)
-                except asyncio.CancelledError:
+                except(asyncio.CancelledError,KeyboardInterrupt):
                     break
 
     async def TaskDiskUsed(self):
@@ -262,12 +266,13 @@ class Processes:
                         self.cola.encolar(record)
                         self.alarms.encolar(record)
 
-            except asyncio.CancelledError:
+            except (asyncio.CancelledError,KeyboardInterrupt):
+                print('fallo en task DiskUsed ')
                 break
             finally:
                 try:
                     await asyncio.sleep(self.timer)
-                except asyncio.CancelledError:
+                except (asyncio.CancelledError,KeyboardInterrupt):
                     break
     async def TaskCpuUsed(self):
 
@@ -331,12 +336,13 @@ class Processes:
 
                             record = schemas.addHistory(**datos)
                             self.cola.encolar(record)
-            except asyncio.CancelledError:
+            except (asyncio.CancelledError,KeyboardInterrupt):
                 self.forhistory.clear()
+                print('fallo en tasCpuUsed')
                 break
             finally:
                 try:
                     await asyncio.sleep(self.timer)
-                except asyncio.CancelledError:
+                except (asyncio.CancelledError,KeyboardInterrupt):
                     break
 

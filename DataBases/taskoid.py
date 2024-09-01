@@ -95,10 +95,14 @@ async def Get_SNMP(task: schemas.taskoid):
                         record = schemas.addHistory(**datos)
                         colaoid.encolar(record)
                         alarm.encolar(record)
-        except Exception:
-            return
+        except (asyncio.CancelledError,KeyboardInterrupt):
+            print('fallo en TaskOID')
+            break
         finally:
-            await asyncio.sleep(task.TIME)
+            try:
+                await asyncio.sleep(task.TIME)
+            except (asyncio.CancelledError,KeyboardInterrupt):
+                break
 
 
 class sensorOID:
@@ -108,7 +112,6 @@ class sensorOID:
         self.tasks = []
 
     async def CreatorTask(self):
-        await asyncio.sleep(2)
         for task in self.tasks:
             task.cancel()
         elements = await Totalagentes(self.id, self.ip)

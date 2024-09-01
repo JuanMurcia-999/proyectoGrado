@@ -20,10 +20,11 @@ from database import SessionLocal, engine
 from Manageable import *
 from Abstracciones import *
 from Gestionables import Ping
-
+from typing import List  
 import json
 from Colahistory import HistoryFIFO
 from ColaAlarms import AlarmsFIFO
+from datetime import datetime
 
 models.Base.metadata.create_all(bind=engine)  # crea la base de datos si no existe
 
@@ -46,22 +47,46 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=False,
+    allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# @app.middleware("http")
-# async def add_csp_header(request, call_next):
-#     response = await call_next(request)
-#     # Aplica CSP solo si no es la ruta /docs o /redoc
-#     if not request.url.path.startswith(("/docs", "/redoc")):
-#         response.headers['Content-Security-Policy'] = "default-src 'self'; connect-src 'self' ws://localhost:8000"
-#     return response
+@app.middleware("http")
+async def csp_middleware(request, call_next):
+    response = await call_next(request)
+    response.headers["Content-Security-Policy"] = "default-src 'self'; ws http://localhost:8080"
+    return response
 
 
 instances = {}
+
+
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
+
+
+manager = ConnectionManager()   
+
+
+
 
 
 def get_db():
@@ -172,9 +197,9 @@ async def create_agent(agent: schemas.CreateAgent, db: Session = Depends(get_db)
             "id_agent": id_agent,
         }
         Agent = schemas.Agent(**data)
-        print(Agent)
         instance = await create_instance_from_Manageable(Agent)
         instances[agent.ag_name] = instance
+        print(instances)
     else:
         raise HTTPException(status_code=400, detail="ya agregado o error")
 
@@ -370,17 +395,22 @@ async def new_alarm(alarm: schemas.newAlarm, db: Session = Depends(get_db)):
 
 
 # --------------------------------------------------------------------------------------------------WebSocket
-# data_store: Dict[str, List[dict]] = {}
-
-# @app.websocket("/ws")
-# async def websocket_endpoint(websocket: WebSocket):
-#     await websocket.accept()
-#     try:
-#         while True:
-#             data = await websocket.receive_json()
-#             await websocket.send_json({"message": "Data received", "data": data})
-#     except WebSocketDisconnect:
-#         await websocket.close()
+@app.websocket("/ws/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: int):
+    await manager.connect(websocket)
+    now = datetime.now()
+    current_time = now.strftime("%H:%M")
+    try:
+        while True:
+            data = await websocket.receive_text()
+            # await manager.send_personal_message(f"You wrote: {data}", websocket)
+            message = {"time":current_time,"clientId":client_id,"message":data}
+            await manager.broadcast(json.dumps(message))
+            
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        message = {"time":current_time,"clientId":client_id,"message":"Offline"}
+        await manager.broadcast(json.dumps(message))
 
 
 # ---------------------------------------------------------------------------------PRUEBAS
