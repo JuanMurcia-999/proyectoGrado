@@ -211,9 +211,9 @@ def get_history_filter(db: Session, filter: schemas.filterHistory):
             .filter(
                 and_(
                     Hf.id_agent == filter.id_agent,
-                    Hf.id_adminis == condition,
-                    Hf.date >= func.date(filter.datebase, filter.daterange),
-                    Hf.time >= func.time('now', filter.timerange),
+                    Hf.id_adminis == condition
+                    # Hf.date >= func.date(filter.datebase, filter.daterange),
+                    # Hf.time >= func.time('now', filter.timerange),
                 )
             )
             .order_by(Hf.date.asc())

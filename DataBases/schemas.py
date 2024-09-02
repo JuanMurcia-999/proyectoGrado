@@ -282,3 +282,13 @@ class ConfigProcesses(BaseModel):
 class ReadDefaultFeature(BaseModel):
     id_feature: int
     fe_name: str
+
+
+
+
+#------------------------------
+
+class operation(BaseModel):
+    ip:str
+    oid:str
+    value: str|int|None

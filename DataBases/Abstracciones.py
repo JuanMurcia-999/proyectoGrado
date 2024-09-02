@@ -45,8 +45,9 @@ class Abtraciones:
 
     async def CPU(self, dato, filter: schemas.filterHistory):
         try:
+            self.names.clear()
             self.base.clear()
-
+            print(filter)
             A = (
                 db.query(Hf.id_adminis)
                 .filter(Hf.id_adminis.like(f"{dato}%"))
@@ -65,9 +66,9 @@ class Abtraciones:
                     .filter(
                         and_(
                             Hf.id_agent == filter.id_agent,
-                            Hf.id_adminis == id,
-                            Hf.date >= func.date(filter.datebase, filter.daterange),
-                            Hf.time >= func.time("now", filter.timerange),
+                            Hf.id_adminis == id
+                            # Hf.date >= func.date(filter.datebase, filter.daterange),
+                            # Hf.time >= func.time("now", filter.timerange),
                         )
                     )
                     .order_by(Hf.date.asc())
@@ -112,9 +113,9 @@ class Abtraciones:
                 .filter(
                     and_(
                         Hf.id_agent == filter.id_agent,
-                        Hf.id_adminis.in_([ids["In"], ids["Out"]]),
-                        Hf.date >= func.date(filter.datebase, filter.daterange),
-                        Hf.time >= func.time("now", filter.timerange),
+                        Hf.id_adminis.in_([ids["In"], ids["Out"]])
+                        # Hf.date >= func.date(filter.datebase, filter.daterange),
+                        # Hf.time >= func.time("now", filter.timerange),
                     )
                 )
                 .order_by(Hf.date.asc())

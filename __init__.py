@@ -1,1 +1,1 @@
-from slim import *
+from BotTelegram import sendmessage

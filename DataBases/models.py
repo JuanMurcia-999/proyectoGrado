@@ -121,3 +121,12 @@ class Alarms(Base):
     operation = Column(String, nullable=False)
     value = Column(Integer, nullable=False)
     counter = Column(Integer, nullable=True)
+
+class Traps(Base):
+    __tablename__ ='traps'
+
+    id_alarm = Column(Integer, autoincrement=True, primary_key=True)
+    ip = Column(String, nullable=False)
+    message = Column(Text, nullable=True)
+    date = Column(Date, server_default=func.current_date())
+    time = Column(Time, server_default=func.current_time())    

@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 # Añade el directorio raíz al sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
+from pysnmp.hlapi.asyncio import  ObjectType, ObjectIdentity
 from ifTable import interfaceTable
 from fastapi import Depends, FastAPI, HTTPException, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,6 +25,9 @@ import json
 from Colahistory import HistoryFIFO
 from ColaAlarms import AlarmsFIFO
 from datetime import datetime
+from slim.slim_get import slim_get
+from slim.slim_set import Set
+
 
 models.Base.metadata.create_all(bind=engine)  # crea la base de datos si no existe
 
@@ -53,11 +56,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.middleware("http")
-async def csp_middleware(request, call_next):
-    response = await call_next(request)
-    response.headers["Content-Security-Policy"] = "default-src 'self'; ws http://localhost:8080"
-    return response
+# @app.middleware("http")
+# async def csp_middleware(request, call_next):
+#     response = await call_next(request)
+#     response.headers["Content-Security-Policy"] = "default-src 'self'; ws http://localhost:8080"
+#     return response
 
 
 instances = {}
@@ -264,6 +267,25 @@ async def read_agents(host: str):
         return salida
     else:
         raise HTTPException(status_code=400, detail="No se puede adquirir la iftable")
+    
+
+@app.post("/snmp/set/")
+async def new_feature(operation: schemas.operation):
+    state = await  Set('public',operation.ip,161,operation.oid,operation.value)
+    if not state:
+        raise HTTPException(status_code=400, detail="ya existe o esta desconectado")
+    
+
+@app.post("/snmp/get/")
+async def new_feature(operation: schemas.operation):
+    print(operation)
+    oid =  ObjectType(ObjectIdentity(operation.oid))
+    state = await slim_get('public', operation.ip,161,oid )
+    if state:
+        _,value=state[0]
+        return value
+    else:
+        raise HTTPException(status_code=400, detail="ya existe o esta desconectado")
 
 
 # --------------------------------------------------------------------------------HISTORIAL
