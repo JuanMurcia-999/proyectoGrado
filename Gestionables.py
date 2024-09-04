@@ -62,7 +62,7 @@ class AnchoBanda:
     def __init__(self, Config: schemas.ConfigAnchoBanda) -> None:
         self.ip = Config.ip
         self.Num_Interface = Config.Num_Interface
-        self.intervalo = Config.intervalo
+        self.intervalo = Config.intervalo * 60 
         self.id_adminis = Config.id_adminis
         self.id = Config.id
         self.cola = Config.history
@@ -141,7 +141,7 @@ class AnchoBanda:
 class Processes:
     def __init__(self, Config: schemas.ConfigProcesses) -> None:
         self.ip = Config.ip
-        self.timer = Config.timer | 60
+        self.timer = Config.timer * 60
         self.id_adminis = Config.id_adminis
         self.id = Config.id
         self.cola = Config.history

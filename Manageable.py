@@ -111,7 +111,7 @@ class ManageableRT(ManageableGeneral):
 
 
     async def task_oid(self):
-         self.instanceoid = sensorOID(self.ip, self.id, self.state_device)
+         self.instanceoid = sensorOID(self.ip, self.id)
          await self.instanceoid.CreatorTask()
 
 

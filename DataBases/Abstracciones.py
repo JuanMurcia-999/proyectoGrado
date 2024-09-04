@@ -67,8 +67,8 @@ class Abtraciones:
                         and_(
                             Hf.id_agent == filter.id_agent,
                             Hf.id_adminis == id
-                            # Hf.date >= func.date(filter.datebase, filter.daterange),
-                            # Hf.time >= func.time("now", filter.timerange),
+                            # Hf.date == func.date(filter.datebase, filter.daterange),
+                            # Hf.time >= func.time("00:00:00", filter.timerange),
                         )
                     )
                     .order_by(Hf.date.asc())
@@ -114,8 +114,8 @@ class Abtraciones:
                     and_(
                         Hf.id_agent == filter.id_agent,
                         Hf.id_adminis.in_([ids["In"], ids["Out"]])
-                        # Hf.date >= func.date(filter.datebase, filter.daterange),
-                        # Hf.time >= func.time("now", filter.timerange),
+                    #     Hf.date == func.date(filter.datebase, filter.daterange),
+                    #     Hf.time >= func.time("00:00:00", filter.timerange),
                     )
                 )
                 .order_by(Hf.date.asc())

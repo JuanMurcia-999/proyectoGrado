@@ -11,6 +11,7 @@ Ad = models.Active_default
 Hf = models.History_features
 Df =models.Default_features
 Al = models.Alarms
+Ts = models.Traps
 # Peticion que retorna todos los agentes en la base de datos
 
 # -------------------------------------------------------------------------------------------AGENTS
@@ -211,9 +212,9 @@ def get_history_filter(db: Session, filter: schemas.filterHistory):
             .filter(
                 and_(
                     Hf.id_agent == filter.id_agent,
-                    Hf.id_adminis == condition
-                    # Hf.date >= func.date(filter.datebase, filter.daterange),
-                    # Hf.time >= func.time('now', filter.timerange),
+                    Hf.id_adminis == condition,
+                    Hf.date == func.date(filter.datebase, filter.daterange),
+                    Hf.time >= func.time("00:00:00", filter.timerange),
                 )
             )
             .order_by(Hf.date.asc())
@@ -302,6 +303,10 @@ def add_history(db: Session, record: schemas.addHistory):
 
 
 def get_default_features_agent(db: Session, id, type):
+    if type == 4:
+        types=[4,2]
+    else:
+        types = [type]
     return (
         db.query(Df.fe_name, Df.id_feature)
         .outerjoin(
@@ -314,7 +319,7 @@ def get_default_features_agent(db: Session, id, type):
         .filter(
             and_(
                 Ad.id_feature.is_(None),
-                Df.id_type.in_([1, type]),
+                Df.id_type.in_([1, *types]),
                 Df.id_feature != 100,
             )
         )
@@ -322,6 +327,10 @@ def get_default_features_agent(db: Session, id, type):
 
 
 def get_active_default(db: Session, id, type):
+    if type == 4:
+        types=[4,2]
+    else:
+        types = [type]
     return (
         db.query(Df.fe_name, Df.id_feature)
         .join(
@@ -331,7 +340,7 @@ def get_active_default(db: Session, id, type):
         .filter(
             and_(
                 Ad.id_agent == id,
-                Df.id_type.in_([1, type]),
+                Df.id_type.in_([1, *types]),
                 Ad.id_feature != 100,
             )
         )
@@ -411,3 +420,14 @@ def add_alarm(db: Session, alarm: schemas.newAlarm):
         return True
     except Exception:
         return False
+
+
+# ------------------------------------------------------------TRAPS
+
+def get_all_traps(db: Session):
+    return db.query(Ts).all()
+
+def get_trap_message(value ,db: Session):
+    
+    valor=db.query(Ts.message).filter(Ts.id_alarm == value).first()
+    return valor[0]

@@ -56,6 +56,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # @app.middleware("http")
 # async def csp_middleware(request, call_next):
 #     response = await call_next(request)
@@ -154,6 +155,10 @@ async def activator_tasks(name: str, nametask: str, params):
             "MemorySize": instance.MemorySize,
             "Networktraffic": instance.Networktraffic,
             "Networktraffic": instance.Networktraffic,
+        }
+    elif isinstance(instance, (ManageableRT)):
+                task_mapping = {
+ 
         }
     task_func = task_mapping.get(nametask)
     if not task_func:
@@ -436,3 +441,12 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
 
 
 # ---------------------------------------------------------------------------------PRUEBAS
+
+
+@app.get("/traps/all/")
+def get_traps(db: Session = Depends(get_db)):
+    return crud.get_all_traps(db=db)
+
+@app.get("/traps/message/{ID}")
+def get_trap_message(ID, db: Session = Depends(get_db)):
+    return crud.get_trap_message(db=db, value=ID)

@@ -40,7 +40,7 @@ class Types(Base):
 
     agents = relationship("Agents", back_populates="type")
     defaultfeatures = relationship("Default_features", back_populates="type")
-
+    
 
 class Agents(Base):
     __tablename__ = "agents"
@@ -54,7 +54,9 @@ class Agents(Base):
     features = relationship(
         "Administered_features", cascade="all, delete", back_populates="agent"
     )
-
+    history =relationship("History_features" ,cascade='all, delete' )
+    Alarms =relationship("Alarms" ,cascade='all, delete' )
+    Actives = relationship("Active_default" , cascade='all,delete')
 
 class Administered_features(Base):
     __tablename__ = "administered_features"
