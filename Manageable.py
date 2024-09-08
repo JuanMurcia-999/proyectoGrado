@@ -59,9 +59,6 @@ class ManageableGeneral:
             print(f'Tarea cancelada: {task}')
 
 
-
-
-
 class ManageablePC(ManageableGeneral):
 
     def __init__(self, ip: str, name: str,id:int) -> None:
@@ -110,9 +107,9 @@ class ManageableRT(ManageableGeneral):
 
 
 
-    async def task_oid(self):
-         self.instanceoid = sensorOID(self.ip, self.id)
-         await self.instanceoid.CreatorTask()
+    # async def task_oid(self):
+    #      self.instanceoid = sensorOID(self.ip, self.id)
+    #      await self.instanceoid.CreatorTask()
 
 
 class ManageableMixto(ManageablePC):

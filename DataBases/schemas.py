@@ -41,7 +41,7 @@ class AgentWithType(Agent):
 
 # features
 
-
+# esquema de datos la creacion de una nueva feature
 class new_features(BaseModel):
     id_adminis: int | None
     id_sensor: int | None

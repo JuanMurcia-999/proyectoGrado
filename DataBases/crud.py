@@ -21,7 +21,8 @@ def get_all_agent(db: Session):
     return db.query(Ag).options(joinedload(Ag.type)).all()
 
 
-# Query para creacion de Agents
+
+# Query para creacion de Agentes
 def create_agent(db: Session, agent: schemas.CreateAgent):
     try:
         db_agent = Ag(

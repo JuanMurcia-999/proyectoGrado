@@ -31,6 +31,7 @@ from slim.slim_set import Set
 
 models.Base.metadata.create_all(bind=engine)  # crea la base de datos si no existe
 
+
 cola = HistoryFIFO()
 alarms = AlarmsFIFO()
 

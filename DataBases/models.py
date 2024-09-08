@@ -31,7 +31,7 @@ class ModelFieldSensor(str, Enum):
     id_adminis = "id_adminis"
 
 
-# Definición de la TABLA Agentes (Agents)
+
 class Types(Base):
     __tablename__ = "types"
 
@@ -41,15 +41,17 @@ class Types(Base):
     agents = relationship("Agents", back_populates="type")
     defaultfeatures = relationship("Default_features", back_populates="type")
     
-
+# Definición de la TABLA Agentes (Agents)
 class Agents(Base):
-    __tablename__ = "agents"
+    __tablename__ = "agents" # Definicion del nombre de la tabla
 
+    # Definicion de los campos de tabla expresados en atributos
     id_agent = Column(Integer, autoincrement=True, primary_key=True)
     ag_name = Column(String, nullable=False, unique=True)
     ip_address = Column(String, nullable=False, unique=True)
     ag_type = Column(Integer, ForeignKey("types.id_type"), nullable=False)
 
+    # Definicion de las relaciones entre esta y otras tablas
     type = relationship("Types", back_populates="agents")
     features = relationship(
         "Administered_features", cascade="all, delete", back_populates="agent"
