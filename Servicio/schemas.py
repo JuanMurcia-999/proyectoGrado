@@ -12,7 +12,7 @@ class TypeBase(BaseModel):
     type_name: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Escritura
@@ -27,7 +27,7 @@ class Agent(CreateAgent):
     id_agent: int | None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # lectura de angesntes con Types
@@ -35,7 +35,7 @@ class AgentWithType(Agent):
     type: TypeBase  # Incluye la información del tipo
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # features
@@ -58,7 +58,7 @@ class features(BaseModel):
     timer: int
 
     class config:
-        orm_mode = True
+        from_attributes = True
 
 
 class Features(features):
@@ -66,7 +66,7 @@ class Features(features):
     id_sensor: int | None
 
     class config:
-        orm_mode = True
+        from_attributes = True
 
 
 # lectura de features con agentes
@@ -74,29 +74,29 @@ class FeatureswithAgent(Features):
     agent: Agent
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class iftable(BaseModel):
     ifIndex: int
     ifDescr: str
-    ifType: int
-    ifMtu: int
-    ifSpeed: int
+    # ifType: int
+    # ifMtu: int
+    # ifSpeed: int
     ifPhysAddress: str
-    ifAdminStatus: int
+    # ifAdminStatus: int
     ifOperStatus: int
-    ifLastChange: int
+    # ifLastChange: int
     ifInOctets: int
-    ifInDiscards: int
-    ifInErrors: int
-    ifInUnknownProtos: int
+    # ifInDiscards: int
+    # ifInErrors: int
+    # ifInUnknownProtos: int
     ifOutOctets: int
-    ifOutUcastPkts: int
-    ifOutNUcastPkts: int
+    # ifOutUcastPkts: int
+    # ifOutNUcastPkts: int
     ifOutDiscards: int
-    ifOutErrors: int
-    ifOutQLen: int
+    # ifOutErrors: int
+    # ifOutQLen: int
     ifSpecific: float
 
 
@@ -128,7 +128,7 @@ class historywithfeature(readHistory):
     feature: Features
 
     class config:
-        orm_mode = True
+        from_attributes = True
 
 
 class getHistory(BaseModel):
@@ -183,7 +183,7 @@ class addDefaultFeature(BaseModel):
     id_type: int
 
     class config:
-        orm_mode = True
+        from_attributes = True
 
 
 class Addactivedefault(BaseModel):
@@ -191,21 +191,21 @@ class Addactivedefault(BaseModel):
     id_agent: int
 
     class config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ReadAddactivedefault(Addactivedefault):
     id_active: int
 
     class config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ActiveWithFeature(ReadAddactivedefault):
     features: addDefaultFeature
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # -----------------------------------------------------------------------------------ALARMAS
@@ -256,8 +256,6 @@ class ConfigAnchoBanda(BaseModel):
     intervalo: int | None
     id_adminis: int
     id: int
-    history: Any 
-    alarms: Any
 
     class Config:
         arbitrary_types_allowed = True
@@ -268,8 +266,6 @@ class ConfigProcesses(BaseModel):
     timer: int | None
     id_adminis: int
     id: int
-    history: Any
-    alarms: Any
 
     class Config:
         arbitrary_types_allowed = True

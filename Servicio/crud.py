@@ -2,7 +2,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy import or_, and_, func
 import models, schemas
 import json
-from datetime import datetime
+from database import get_db
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -15,8 +15,9 @@ Ad = models.Active_default
 Hf = models.History_features
 Df = models.Default_features
 Al = models.Alarms
-# # Peticion que retorna todos los agentes en la base de datos
 
+
+# # Peticion que retorna todos los agentes en la base de datos
 # -------------------------------------------------------------------------------------------AGENTS
 
 
@@ -36,11 +37,11 @@ async def create_agent(db: AsyncSession, agent: schemas.CreateAgent):
         )
 
         db.add(db_agent)
-        await db.commit()  # Usa await para operaciones asincrónicas
-        await db.refresh(db_agent)  # También aquí
+        await db.commit()  
+        await db.refresh(db_agent)  
         return db_agent.id_agent
     except Exception as e:
-        print(f"Error: {e}")  # Es mejor registrar el error
+        print(f"Error: {e}") 
         return False
 
 
@@ -50,11 +51,11 @@ async def delete_agent(db: AsyncSession, field, value):
         result = await db.execute(select(Ag).filter(getattr(Ag, field) == value))
         db_agent = result.scalars().first()
         if db_agent:
-            await db.delete(db_agent)  # Usa await aquí
-            await db.commit()  # Usa await aquí
+            await db.delete(db_agent)  
+            await db.commit()  
             return db_agent
     except Exception as e:
-        print(f"Error: {e}")  # Registro del error
+        print(f"Error: {e}")  
         return False
     finally:
         print("Operación terminada")
@@ -95,8 +96,7 @@ async def new_feature(db: AsyncSession, feature: schemas.new_features):
         return True
     except Exception:
         return False
-    finally:
-        await db.close()
+
 
 
 # Query para eleiminacion de features
@@ -104,7 +104,9 @@ async def delete_feature(db: AsyncSession, id):
     try:
         # Ejecutar la consulta y esperar el resultado
         result = await db.execute(select(Af).filter(Af.id_adminis == id))
-        db_feature = result.scalar_one_or_none()  # Usa scalar_one_or_none para obtener un solo resultado
+        db_feature = (
+            result.scalar_one_or_none()
+        )
 
         if db_feature:
             await db.delete(db_feature)
@@ -143,7 +145,7 @@ async def get_history_sensor(db: AsyncSession, filter: schemas.getHistory):
         condition = filter.id_sensor
         column = "id_sensor"
 
-    # Consulta asincrónica para obtener los valores y tiempos
+   
     result = await db.execute(
         select(Hf.value, Hf.time).filter(
             Hf.id_adminis == condition,
@@ -152,7 +154,7 @@ async def get_history_sensor(db: AsyncSession, filter: schemas.getHistory):
     )
     response = result.fetchall()
 
-    # Consulta asincrónica para obtener el nombre del sensor
+    
     result_namesensor = await db.execute(
         select(Af.adminis_name).filter(getattr(Af, column) == condition)
     )
@@ -168,11 +170,10 @@ async def get_history_sensor(db: AsyncSession, filter: schemas.getHistory):
     return {"value": {name: values}, "created_at": date}
 
 
-# Modelo de respuesta par las interfaces
 
 
 async def get_history_Network(db: AsyncSession, filter: schemas.getHistory):
-    # Consulta asincrónica para el tráfico de entrada (IN)
+    
     result_in = await db.execute(
         select(Hf.value, Hf.date)
         .filter(
@@ -183,7 +184,7 @@ async def get_history_Network(db: AsyncSession, filter: schemas.getHistory):
     )
     IN = result_in.fetchall()
 
-    # Consulta asincrónica para el tráfico de salida (OUT)
+   
     result_out = await db.execute(
         select(Hf.value, Hf.date)
         .filter(
@@ -194,7 +195,7 @@ async def get_history_Network(db: AsyncSession, filter: schemas.getHistory):
     )
     OUT = result_out.fetchall()
 
-    # Extracción de valores y fechas
+    
     valuesIN = [item[0] for item in IN]
     valuesOUT = [item[0] for item in OUT]
     date = [item[1].strftime("%Y-%m-%d") for item in IN]
@@ -202,8 +203,25 @@ async def get_history_Network(db: AsyncSession, filter: schemas.getHistory):
     return {"value": {"valuesIN": valuesIN, "valuesOUT": valuesOUT}, "created_at": date}
 
 
-######################################   FILTRADO DE DATOS
+########################################################################333   FILTRADO DE DATOS
 
+Faile = {
+                "data": {
+                    "datagrafic": [
+                        {
+                            "name": "Sin datos",
+                            "values": [],
+                            "date": [],
+                            "time": [],
+                            "stadistics": {
+                                "min": 0,
+                                "max": 0,
+                                "avg": 0,
+                            },
+                        }
+                    ],
+                },
+            }
 
 async def get_history_filter(db: AsyncSession, filter: schemas.filterHistory):
     if filter.id_sensor is None:
@@ -214,7 +232,7 @@ async def get_history_filter(db: AsyncSession, filter: schemas.filterHistory):
         column = "id_sensor"
 
     try:
-        # Consulta asincrónica para obtener el historial
+       
         result = await db.execute(
             select(Hf.value, Hf.time, Hf.date)
             .filter(and_(Hf.id_agent == filter.id_agent, Hf.id_adminis == condition))
@@ -223,7 +241,7 @@ async def get_history_filter(db: AsyncSession, filter: schemas.filterHistory):
             .offset(filter.offset)
         )
         response = result.fetchall()
-        # Consulta asincrónica para obtener el nombre del sensor
+       
         name_result = await db.execute(
             select(Af.adminis_name).filter(getattr(Af, column) == condition)
         )
@@ -256,58 +274,33 @@ async def get_history_filter(db: AsyncSession, filter: schemas.filterHistory):
                 },
             }
         else:
-            return {
-                "data": {
-                    "datagrafic": [
-                        {
-                            "name": "Sin datos",
-                            "values": [],
-                            "date": [],
-                            "time": [],
-                            "stadistics": {
-                                "min": 0,
-                                "max": 0,
-                                "avg": 0,
-                            },
-                        }
-                    ],
-                },
-            }
+            return Faile
     except Exception as e:
-     
-            return {
-                "data": {
-                    "datagrafic": [
-                        {
-                            "name": "Sin datos",
-                            "values": [],
-                            "date": [],
-                            "time": [],
-                            "stadistics": {
-                                "min": 0,
-                                "max": 0,
-                                "avg": 0,
-                            },
-                        }
-                    ],
-                },
-            }
+
+        return Faile
 
 
 ####################################################################################
 # Agregar un nuevo registro al historial
-async def add_history(db: AsyncSession, record: schemas.addHistory):
-    db_history = Hf(
-        id_agent=record.id_agent, id_adminis=record.id_adminis, value=record.value
-    )
+async def add_history(data):
+    async for db in get_db():
+        try:
+                async for db in get_db():
+                    db_history = models.History_features(
+                        id_agent=data.id_agent,
+                        id_adminis=data.id_adminis,
+                        value=data.value,
+                    )
 
-    db.add(db_history)
-    await db.commit()  # Esperar a que se complete la transacción
-    await db.refresh(
-        db_history
-    )  # Esperar a que se actualice el objeto con los datos de la base de datos
+                    db.add(db_history)
+                    await db.commit()
+                    await db.refresh(db_history)
+                    return True
+        except Exception :
+                print("algo paso add_history")
+                return False
 
-    return db_history
+        
 
 
 # ----------------------------------------------------------------------------------------GESTIONABLES
@@ -355,6 +348,15 @@ async def get_active_default(db: AsyncSession, id, type):
 
 
 async def add_active_default(db: AsyncSession, dates: schemas.Manageable):
+    result = await db.execute(
+        select(Ad).filter(
+            and_(Ad.id_agent == dates.id_agent, Ad.id_feature == dates.id_feature)
+        )
+    )
+    if result:
+        print("ya existe")
+    else:
+        print("agregado")
     try:
         params_json = json.dumps(dates.params)
         addactive = Ad(
@@ -362,9 +364,9 @@ async def add_active_default(db: AsyncSession, dates: schemas.Manageable):
         )
 
         db.add(addactive)
-        await db.commit()  # Esperar a que se complete la transacción
+        await db.commit()  
         await db.refresh(addactive)
-        print(addactive)  # Esperar a refrescar el objeto
+        print(addactive) 
         return addactive
     except Exception:
         print("fallo e add_active_Default")
@@ -384,12 +386,12 @@ async def delete_feature_two(db: AsyncSession, name, id):
         )
     )
 
-    db_feature = result.scalars().all()  # Obtener los resultados como una lista
+    db_feature = result.scalars().all()  #
 
     if db_feature:
         for feature in db_feature:
-            await db.delete(feature)  # Usar await para eliminar la característica
-        await db.commit()  # Esperar a que se complete la transacción
+            await db.delete(feature) 
+        await db.commit() 
         return True
     return False
 
@@ -398,7 +400,7 @@ async def delete_feature_two(db: AsyncSession, name, id):
 async def get_alarm(db: AsyncSession, id_agent):
     try:
         result = await db.execute(select(Al).filter(Al.id_agent == id_agent))
-        return result.scalars().all()  # Obtener todos los resultados como una lista
+        return result.scalars().all()  
     except Exception:
         return False
 
@@ -408,11 +410,11 @@ async def delete_alarm(db: AsyncSession, id_alarm):
 
     db_alarm_instance = (
         db_alarm.scalar_one_or_none()
-    )  # Obtener una única instancia o None
+    )  
 
     if db_alarm_instance:
-        await db.delete(db_alarm_instance)  # Usar await para eliminar la alarma
-        await db.commit()  # Esperar a que se complete la transacción
+        await db.delete(db_alarm_instance)  
+        await db.commit()  
         return True
     else:
         return False
@@ -429,50 +431,162 @@ async def add_alarm(db: AsyncSession, alarm: schemas.newAlarm):
         )
 
         db.add(addalarm)
-        await db.commit()  # Esperar a que se complete la transacción
-        await db.refresh(addalarm)  # Esperar a refrescar el objeto
+        await db.commit() 
+        await db.refresh(addalarm)  
 
         return True
     except Exception:
         return False
 
 
-# --------------------------------------------------  del main
-
-
 # ---------------------------------------------------- de ColaAlarms
 
 
-async def get_administered_feature(db: AsyncSession, column: str, tarea):
-    async with db.begin():
-        query = await db.execute(
-            select(models.Administered_features).filter(
-                getattr(models.Administered_features, column) == tarea.id_adminis
-            )
-        )
-        return query.scalars().first()
-
-
-async def get_alarms(db: AsyncSession, column: str, data):
-    try:
-        stmt = (
-            select(models.Alarms)
-            .join(
-                models.Administered_features,
-                models.Alarms.id_adminis == models.Administered_features.id_adminis,
-            )
-            .filter(
-                and_(
-                    getattr(models.Administered_features, column) == data.id_adminis,
-                    models.Administered_features.id_agent == data.id_agent,
+async def get_administered_feature(column: str, tarea):
+    async for db in get_db():
+        try:
+            query = await db.execute(
+                select(models.Administered_features).filter(
+                    getattr(models.Administered_features, column) == tarea.id_adminis
                 )
             )
-        )
+            return query.scalars().first()
+        except Exception:
+            print("fallo en get_administered_feature")
 
-        # Ejecutar la consulta y obtener el primer resultado
-        result = await db.execute(stmt)
-    except Exception:
-        print("fallo en get_alarms")
-    finally:
-        await db.close()
-        return result.scalars().first()
+
+async def get_alarms(column: str, data):
+    async for db in get_db():
+        try:
+            stmt = (
+                select(models.Alarms)
+                .join(
+                    models.Administered_features,
+                    models.Alarms.id_adminis == models.Administered_features.id_adminis,
+                )
+                .filter(
+                    and_(
+                        getattr(models.Administered_features, column)
+                        == data.id_adminis,
+                        models.Administered_features.id_agent == data.id_agent,
+                    )
+                )
+            )
+
+            result = await db.execute(stmt)
+            return result.scalars().first()
+        except Exception:
+            print("fallo en get_alarms")
+
+
+# --------------------------------------------------------------------- procesos de los demas modeulos
+
+# taskoid
+
+
+async def get_unique_times(id_agent):
+    async for db in get_db():
+        try:
+            return (
+                (
+                    await db.execute(
+                        select(Af.timer)
+                        .filter(
+                            Af.id_agent == id_agent,
+                            Af.oid != "",
+                        )
+                        .distinct()
+                    )
+                )
+                .scalars()
+                .all()
+            )
+        except Exception as e:
+            print(e)
+
+
+async def get_features_oid(inter, id_agent):
+    async for db in get_db():
+        try:
+            return (
+                await db.execute(
+                    select(Af.oid, Af.id_adminis).filter(
+                        Af.timer == f"{inter}",
+                        Af.id_agent == id_agent,
+                        Af.oid != "",
+                    )
+                )
+            ).all()
+        except Exception:
+            print("fallo en get_features")
+
+
+# --------------------------------------------------------------------------- main
+
+async def get_sensors_startup(id):
+    async for db in get_db():
+        try:
+            return (
+                (
+                    await db.execute(
+                        select(models.Active_default)
+                        .options(joinedload(models.Active_default.features))
+                        .filter(models.Active_default.id_agent == id)
+                    )
+                )
+                .scalars()
+                .all()
+            )
+        
+        except Exception:
+            print('fallo en get_sensors_startup')
+
+# -----------------------------------------------------------------------Abstracciones
+
+async def get_A_cpu(date):
+    async for db in get_db():
+        try:
+            return(await db.execute(
+                select(Hf.id_adminis).filter(Hf.id_adminis.like(f"{date}%")).distinct()
+            )).scalars().all()
+        except  Exception:
+            print('fallo get_A_cpu')
+
+
+async def get_B_cpu(filter:schemas.filterHistory):
+    async for db in get_db():
+        try:
+           return (await db.execute(
+                    select(Hf.value, Hf.time, Hf.date)
+                    .filter(
+                        and_(
+                            Hf.id_agent == filter.id_agent,
+                            Hf.id_adminis == id
+                        )
+                    )
+                    .order_by(Hf.date.asc())
+                    .limit(filter.limit)
+                    .offset(filter.offset)
+                )).all()
+            
+        except Exception:
+            print('fallo get_B_cpu')
+
+async def get_B_network(filter:schemas.filterHistory, ids):
+    async for db in get_db():
+        try:
+            return (await db.execute(
+                select(Hf.value, Hf.time, Hf.date)
+                .filter(
+                    and_(
+                        Hf.id_agent == filter.id_agent,
+                        Hf.id_adminis.in_([ids["In"], ids["Out"]]),
+                    )
+                )
+                .order_by(Hf.date.asc())
+                .limit(filter.limit)
+                .offset(filter.offset)
+            )).all()
+        except Exception:
+            print('fallo get_B_network')
+

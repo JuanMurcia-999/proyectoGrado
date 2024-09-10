@@ -1,84 +1,68 @@
 import sys
 import os
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
 
-# Añade el directorio raíz al sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from sqlalchemy.future import select
+
+
 from Utilizables.Gestionables import *
 from Utilizables.Manageable import *
 from Utilizables.ifTable import interfaceTable
+from Utilizables.Register import Writer
 from fastapi import Depends, FastAPI, HTTPException
-from sqlalchemy.orm import joinedload
 
 from contextlib import asynccontextmanager
 import crud, models, schemas
-from database import SessionLocal, engine, Base
+from database import engine, Base, get_db
 from Abstracciones import *
-from colaDos import AsyncFIFOQueue
-
 import json
-from Colahistory import HistoryFIFO
-from ColaAlarms import AlarmsFIFO
-
+from datetime import datetime
+import time
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Lifespan function started")
-    # asyncio.create_task(AsyncFIFOQueue().add(1))
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     await create_instance_startup()
-    # asyncio.create_task(Ping().Exectping())
+    asyncio.create_task(Ping().Exectping())
     print("Lifespan function finished")
-    yield
-    await Exit_service()
 
+    try:
+        Writer(f"\ndatestartup = : {datetime.now()}\n")
+        start_time = time.time()
+        Writer(f"starttime = {start_time}\n")
 
+        yield
+    finally:
+        end_time = time.time()
+        Writer(f"endtime = {start_time}\n")
+        Writer(f"totaltime = {end_time - start_time}\n\n")
+        await Exit_service()
 
-
-alarms = AlarmsFIFO()
 
 app = FastAPI(lifespan=lifespan)
 
 instances = {}
 
 
-async def get_db():
-    async with SessionLocal() as db:
-        yield db
-
-cola = AsyncFIFOQueue(db)
-
 async def Exit_service():
-    await SessionLocal().close()
-    print(instances)
     for name, proc in instances.items():
         await proc.cancel_end()
-    
+
 
 async def create_instance_startup():
-    agents = await crud.get_all_agent(db=db)
+    async for db in get_db():
+        agents = await crud.get_all_agent(db=db)
     for agent in agents:
-        
+
         await Ping().addagent(agent.id_agent, agent.ip_address)
         instance = await create_instance_from_Manageable(agent)
         instances[agent.ag_name] = instance
         await instance.task_oid()
-        sensors = (
-            (
-                await db.execute(
-                    select(models.Active_default)
-                    .options(joinedload(models.Active_default.features))
-                    .filter(models.Active_default.id_agent == agent.id_agent)
-                )
-            )
-            .scalars()
-            .all()
-        )
+        sensors = await crud.get_sensors_startup(agent.id_agent)
+
         for sensor in sensors:
             params = json.loads(sensor.params)
             await activator_tasks(
@@ -134,7 +118,7 @@ async def activator_tasks(name: str, nametask: str, params):
             "CpuUsed",
             "DiskUsed",
         ]:
-            await task_func(params, nametask, cola, alarms)
+            await task_func(params, nametask)
             return True
         else:
             await task_func()
@@ -166,6 +150,7 @@ async def create_agent(agent: schemas.CreateAgent, db: AsyncSession = Depends(ge
         Agent = schemas.Agent(**data)
         instance = await create_instance_from_Manageable(Agent)
         instances[agent.ag_name] = instance
+        await instance.task_oid()
     else:
         raise HTTPException(status_code=400, detail="ya agregado o error")
 
@@ -251,7 +236,9 @@ async def read_history_sensor(
 
 
 @app.post("/history/filter/")
-async def read_history_sensor(filter: schemas.filterHistory, db: AsyncSession = Depends(get_db)):
+async def read_history_sensor(
+    filter: schemas.filterHistory, db: AsyncSession = Depends(get_db)
+):
     if filter.id_sensor == 105:
         dato = f"{filter.id_sensor}{filter.id_agent}"
         return await Abtraciones().CPU(dato, filter)

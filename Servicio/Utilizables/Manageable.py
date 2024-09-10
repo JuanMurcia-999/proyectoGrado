@@ -1,8 +1,7 @@
-import asyncio
 from .Gestionables import AnchoBanda,Processes
 from taskoid import sensorOID
 import schemas
-
+import asyncio
 
 
 class ManageableGeneral:
@@ -11,12 +10,12 @@ class ManageableGeneral:
         self.ip = ip
         self.id = id
     
-    async def Networktraffic(self, params,nametask,cola,alarms) -> None:
+    async def Networktraffic(self, params,nametask) -> None:
         taskname = nametask+params['num_interface']
         try:
             # Crear una tarea para ejecutar AnchoBanda y agregarla al diccionario de tareas
             Config = {"ip":self.ip, "Num_Interface": params['num_interface'], "intervalo":params['timer'],
-                      "id_adminis":params['id_adminis'],"id":self.id, "history":cola,"alarms":alarms}
+                      "id_adminis":params['id_adminis'],"id":self.id}
             Config = schemas.ConfigAnchoBanda(**Config)
             task = asyncio.create_task(
                 AnchoBanda(Config=Config).run()
@@ -74,9 +73,9 @@ class ManageablePC(ManageableGeneral):
 
 
 
-    async def NumProccesses(self, params, task_id,cola,alarms):
+    async def NumProccesses(self, params, task_id):
         try:
-            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id, "history":cola, "alarms":alarms}
+            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id}
             Config = schemas.ConfigProcesses(**Config)
             task = asyncio.create_task(
                 Processes(Config=Config).TaskNumProcesses()
@@ -86,9 +85,9 @@ class ManageablePC(ManageableGeneral):
         except Exception as e:
               print(f'Error en la descripción: {e}')
  
-    async def MemorySize(self, params, task_id,cola,alarms):
+    async def MemorySize(self, params, task_id):
         try:
-            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id, "history":cola, "alarms":alarms}
+            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id}
             Config = schemas.ConfigProcesses(**Config)
             task = asyncio.create_task(
                 Processes(Config=Config).TaskMemorySize()
@@ -110,7 +109,7 @@ class ManageableRT(ManageableGeneral):
 
 
     async def task_oid(self):
-         self.instanceoid = sensorOID(self.ip, self.id, self.state_device)
+         self.instanceoid = sensorOID(self.ip, self.id)
          await self.instanceoid.CreatorTask()
 
 
@@ -124,9 +123,9 @@ class ManageableMixto(ManageablePC):
         self.instanceoid = sensorOID
         self.instance = None
 
-    async def MemoryUsed(self, params, task_id,cola,alarms):
+    async def MemoryUsed(self, params, task_id):
         try:
-            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id, "history":cola, "alarms":alarms}
+            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id}
             Config = schemas.ConfigProcesses(**Config)
             task = asyncio.create_task(
                 Processes(Config=Config).TaskMemoryUsed()
@@ -137,9 +136,9 @@ class ManageableMixto(ManageablePC):
                 print(f'Error en la descripción: {e}')
 
 
-    async def CpuUsed(self, params, task_id,cola,alarms):
+    async def CpuUsed(self, params, task_id):
         try:
-            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id, "history":cola, "alarms":alarms}
+            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id}
             Config = schemas.ConfigProcesses(**Config)
             task = asyncio.create_task(
                 Processes(Config=Config).TaskCpuUsed()
@@ -150,9 +149,9 @@ class ManageableMixto(ManageablePC):
                 print(f'Error en la descripción: {e}')
 
 
-    async def DiskUsed(self, params, task_id,cola,alarms):
+    async def DiskUsed(self, params, task_id):
         try:
-            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id, "history":cola, "alarms":alarms}
+            Config = {"ip":self.ip, "timer":params['timer'],"id_adminis":params['id_adminis'],"id":self.id}
             Config = schemas.ConfigProcesses(**Config)
             task = asyncio.create_task(
                 Processes(Config=Config).TaskDiskUsed()

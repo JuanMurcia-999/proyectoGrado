@@ -1,11 +1,14 @@
 from pysnmp.smi.rfc1902 import ObjectIdentity, ObjectType
+from Servicio.Historyqueue import HistoryFIFOQueue
+from Servicio.Alarmqueue import AlarmFIFOQueue
+from Utilizables.Register import Writer
 from slim.slim_get import slim_get
+import subprocess
 import asyncio
 import schemas
-import subprocess
-import time
-from colaDos import AsyncFIFOQueue
 
+history = HistoryFIFOQueue()
+alarm =  AlarmFIFOQueue()
 
 class Ping:
     agentes = {}
@@ -18,20 +21,15 @@ class Ping:
 
             for id, ip in self.agentes.items():
                 tasks.append(self.ping_and_update_state(id, ip))
-            # Ejecutar todas las tareas concurrentemente
             await asyncio.gather(*tasks)
-            # await asyncio.sleep(2)
-
+           
     async def ping_and_update_state(self, id, ip):
         while True:
-            """Realiza el ping y actualiza el estado de forma concurrente"""
             state = await asyncio.to_thread(self.ping_host, ip)
             self.states[id] = state
-            print(self.states)
             await asyncio.sleep(2)
 
     def ping_host(self, ip):
-        """Función bloqueante para ejecutar el ping"""
         p = subprocess.Popen(
             ["ping", "-n", "2", "-w", "2", ip],
             stdout=subprocess.PIPE,
@@ -64,15 +62,14 @@ class AnchoBanda:
 
     ifInOctets = "1.3.6.1.2.1.2.2.1.10"
     ifOutOctets = "1.3.6.1.2.1.2.2.1.16"
-
+    Countgets = 0
     def __init__(self, Config: schemas.ConfigAnchoBanda) -> None:
         self.ip = Config.ip
         self.Num_Interface = Config.Num_Interface
         self.intervalo = Config.intervalo
         self.id_adminis = Config.id_adminis
         self.id = Config.id
-        self.cola = Config.history
-        self.alarms = Config.alarms
+
 
     async def run(self):
         print(f"Ejecutando run de {self.ip}")
@@ -94,6 +91,7 @@ class AnchoBanda:
 
                     varbinds = await peticion(community, self.ip, port, objects)
                     if varbinds:
+                        self.Countgets +=1
                         for varBind in varbinds:
                             _, value = varBind
                             InOut1.append(int(value))
@@ -128,19 +126,18 @@ class AnchoBanda:
 
                         record1 = schemas.addHistory(**dIn)
                         record2 = schemas.addHistory(**dOut)
-                        print('Interfaces')
-                        # await self.cola.encolar(record1)
-                        # await self.cola.encolar(record2)
-                        # await self.alarms.encolar(record1)
-                        # await self.alarms.encolar(record2)
-                        await self.cola.add(record1)
-                        await self.cola.add(record2)
+                        await history.add(record1)
+                        await history.add(record2)
+                        await alarm.add(record1)
+                        await alarm.add(record2)
+
             except (asyncio.CancelledError,KeyboardInterrupt):
                 break
             finally:
                 try:
                     await asyncio.sleep(1)
-                except asyncio.CancelledError:
+                except (asyncio.CancelledError,KeyboardInterrupt):
+                    Writer(f"id_agent= {self.id}, id_adminis= {100}, Ejecuciones= {self.Countgets}\n")
                     break
 
 
@@ -148,24 +145,22 @@ class AnchoBanda:
 class Processes:
     def __init__(self, Config: schemas.ConfigProcesses) -> None:
         self.ip = Config.ip
-        self.timer = Config.timer | 60
+        self.timer = Config.timer *60 | 60
         self.id_adminis = Config.id_adminis
         self.id = Config.id
-        self.cola = Config.history
-        self.alarms = Config.alarms
         self.forhistory = {}
 
     async def TaskNumProcesses(self):
+        counter=0
         while True:
-            await Ping().getstate(self.id)
             try:
-                print('ejecutando Numprocesses')
                 if await Ping().getstate(self.id):
                     community = "public"
                     port = 161
                     objects = [ObjectType(ObjectIdentity("1.3.6.1.2.1.25.1.6.0"))]
                     varbinds = await peticion(community, self.ip, port, objects)
                     if varbinds:
+                        counter +=1
                         _, num_processes = varbinds[0]
                         num_processes = int(num_processes)
 
@@ -177,19 +172,20 @@ class Processes:
                         }
 
                         record = schemas.addHistory(**datos)
-                        print(record)
-                        await self.cola.add(record)
-                        # await self.cola.encolar(record)
-                        # await self.alarms.encolar(record)
+                        await history.add(record)
+                        await alarm.add(record)
+
             except (asyncio.CancelledError,KeyboardInterrupt):
                 break
             finally:
                 try:
                     await asyncio.sleep(self.timer)
                 except (asyncio.CancelledError,KeyboardInterrupt):
+                    Writer(f"id_agent= {self.id}, id_adminis= {self.id_adminis}, Ejecuciones= {counter}\n")
                     break
 
     async def TaskMemorySize(self):
+        counter =0
         while True:
             try:
                 if await Ping().getstate(self.id):
@@ -198,6 +194,7 @@ class Processes:
                     objects = [ObjectType(ObjectIdentity("1.3.6.1.2.1.25.2.2.0"))]
                     varbinds = await peticion(community, self.ip, port, objects)
                     if varbinds:
+                        counter +=1
                         _, MemorySize = varbinds[0]
                         MemorySize = int(MemorySize)
 
@@ -209,9 +206,8 @@ class Processes:
                         }
                         # print('MemorySize')
                         record = schemas.addHistory(**datos)
-                        await self.cola.add(record)
-                        # await self.cola.encolar(record)
-                        # await self.alarms.encolar(record)
+                        await history.add(record)
+                        await alarm.add(record)
 
             except (asyncio.CancelledError,KeyboardInterrupt):
                 break
@@ -219,9 +215,11 @@ class Processes:
                 try:
                     await asyncio.sleep(self.timer)
                 except (asyncio.CancelledError,KeyboardInterrupt):
+                    Writer(f"id_agent= {self.id}, id_adminis= {self.id_adminis}, Ejecuciones= {counter}\n")
                     break
 
     async def TaskMemoryUsed(self):
+        counter =0
         while True:
             try:
                 if await Ping().getstate(self.id):
@@ -230,6 +228,7 @@ class Processes:
                     objects = [ObjectType(ObjectIdentity("1.3.6.1.3.100.4.0"))]
                     varbinds = await peticion(community, self.ip, port, objects)
                     if varbinds:
+                        counter +=1
                         _, MemorySize = varbinds[0]
                         MemorySize = int(MemorySize)
 
@@ -241,9 +240,8 @@ class Processes:
                         }
                         # print('MemoryUsed')
                         record = schemas.addHistory(**datos)
-                        await self.cola.add(record)
-                        # await self.cola.encolar(record)
-                        # await self.alarms.encolar(record)
+                        await history.add(record)
+                        await alarm.add(record)
 
             except (asyncio.CancelledError,KeyboardInterrupt):
                 break
@@ -251,10 +249,11 @@ class Processes:
                 try:
                     await asyncio.sleep(self.timer)
                 except (asyncio.CancelledError,KeyboardInterrupt):
+                    Writer(f"id_agent= {self.id}, id_adminis= {self.id_adminis}, Ejecuciones= {counter}\n")
                     break
 
     async def TaskDiskUsed(self):
-
+        counter =0
         while True:
             try:
                 if await Ping().getstate(self.id):
@@ -266,6 +265,7 @@ class Processes:
 
                     varbinds = await peticion(community, self.ip, port, objects)
                     if varbinds:
+                        counter +=1
                         _, value = varbinds[0]
                         datos = {
                             "id_agent": self.id,
@@ -273,9 +273,8 @@ class Processes:
                             "value": int(value),
                         }
                         record = schemas.addHistory(**datos)
-                        await self.cola.add(record)
-                        # await self.cola.encolar(record)
-                        # await self.alarms.encolar(record)
+                        await history.add(record)
+                        await alarm.add(record)
 
             except (asyncio.CancelledError,KeyboardInterrupt):
                 break
@@ -283,11 +282,12 @@ class Processes:
                 try:
                     await asyncio.sleep(self.timer)
                 except (asyncio.CancelledError,KeyboardInterrupt):
+                    Writer(f"id_agent= {self.id}, id_adminis= {self.id_adminis}, Ejecuciones= {counter}\n")
                     break
 
 
     async def TaskCpuUsed(self):
-
+        counter =0
         while True:
             try:
                 if await Ping().getstate(self.id):
@@ -298,6 +298,7 @@ class Processes:
                         [ObjectType(ObjectIdentity("1.3.6.1.3.100.5.2.0"))],
                     )
                     if A:
+                        counter +=1
                         # print('CpuUsed')
                         _, NumCores = A[0]
                         self.forhistory["TaskCpuUsed"] = [
@@ -327,10 +328,8 @@ class Processes:
                         }
 
                         record = schemas.addHistory(**datos)
-                        await self.cola.add(record)
-                        # await self.cola.encolar(record)
-                        # record.id_adminis = 105
-                        # await self.alarms.encolar(record)
+                        await history.add(record)
+                        await alarm.add(record)
 
                         oids = [
                             ObjectType(ObjectIdentity(f"1.3.6.1.3.100.5.2.2.{i}"))
@@ -347,8 +346,8 @@ class Processes:
                             }
 
                             record = schemas.addHistory(**datos)
-                            await self.cola.add(record)
-                            # await self.cola.encolar(record)
+                            await history.add(record)
+              
             except (asyncio.CancelledError,KeyboardInterrupt):
                 self.forhistory.clear()
                 break
@@ -356,5 +355,6 @@ class Processes:
                 try:
                     await asyncio.sleep(self.timer)
                 except (asyncio.CancelledError,KeyboardInterrupt):
+                    Writer(f"id_agent= {self.id}, id_adminis= {self.id_adminis}, Ejecuciones= {counter}\n")
                     break
 

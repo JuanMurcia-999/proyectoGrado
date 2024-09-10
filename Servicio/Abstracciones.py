@@ -1,16 +1,8 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import or_, and_, func
 import models
 import schemas
-from database import SessionLocal
-from sqlalchemy.future import select
+import crud
 
-# Configuración de la base de datos
-# DATABASE_URL = "sqlite+aiosqlite:///GestorDB.sqlite"
-# engine = create_engine(DATABASE_URL)
-# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-db = SessionLocal()
+
 
 Fail = {
     "data": {
@@ -47,10 +39,7 @@ class Abtraciones:
     async def CPU(self, dato, filter: schemas.filterHistory):
         try:
             self.base.clear()
-            A = await db.execute(
-                select(Hf.id_adminis).filter(Hf.id_adminis.like(f"{dato}%")).distinct()
-            )
-            A = A.scalars().all()
+            A = await crud.get_A_cpu(dato)
 
             id_adminis = [id for id in A]
             self.names[id_adminis[0]] = "General"
@@ -58,21 +47,7 @@ class Abtraciones:
                 self.names[id_adminis[id]] = f"Core{id}"
             for id, name in self.names.items():
 
-                B = await db.execute(
-                    select(Hf.value, Hf.time, Hf.date)
-                    .filter(
-                        and_(
-                            Hf.id_agent == filter.id_agent,
-                            Hf.id_adminis == id
-                        )
-                    )
-                    .order_by(Hf.date.asc())
-                    .limit(filter.limit)
-                    .offset(filter.offset)
-                )
-                B = B.all()
-
-        
+                B = await crud.get_B_cpu(filter)
 
                 values = [item.value for item in B]
                 time = [item.time.strftime("%H:%M:%S") for item in B]
@@ -99,33 +74,17 @@ class Abtraciones:
 
     async def NETWORK(self, filter: schemas.filterHistory):
         try:
-            print(filter)
             self.base.clear()
             id_adminis = int(str(filter.id_sensor)[:-1])
             ids = {
                 name: int(f"{id_adminis}{item}")
                 for name, item in zip(("In", "Out"), (0, 1))
             }
-            
-            B = await db.execute(
-                select(Hf.value, Hf.time, Hf.date)
-                .filter(
-                    and_(
-                        Hf.id_agent == filter.id_agent,
-                        Hf.id_adminis.in_([ids["In"], ids["Out"]])
-                    )
-                )
-                .order_by(Hf.date.asc())
-                .limit(filter.limit)
-                .offset(filter.offset)
-            )
-            
-            B = B.all()
-            
-            
+
+            B = await crud.get_B_network(filter,ids)
+
             In = [item for item in B[::2]]
             Out = [item for item in B[1::2]]
-            print(Out)
 
             for id, data in zip(ids, (In, Out)):
                 values = [item.value for item in data]
@@ -147,9 +106,7 @@ class Abtraciones:
                 )
             return self.response_json
         except Exception:
-            print('fallo NETWORK')
+            print("fallo NETWORK")
             return Fail
         finally:
-            print('algo fue')
             self.names.clear()
-           

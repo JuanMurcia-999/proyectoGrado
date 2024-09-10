@@ -1,125 +1,73 @@
-import sys
-import os
-import asyncio
-
-# Añade el directorio raíz al sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from sqlalchemy.future import select
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from pysnmp.smi.rfc1902 import ObjectIdentity, ObjectType
-from slim.slim_get import slim_get
-import models
-import schemas
-from Colahistory import HistoryFIFO
-from ColaAlarms import AlarmsFIFO
-from colaDos import AsyncFIFOQueue
+from Servicio.Historyqueue import HistoryFIFOQueue
+from Servicio.Alarmqueue import AlarmFIFOQueue
 from Utilizables.Gestionables import Ping
-from database import SessionLocal
+from Utilizables.Register import Writer
+from slim.slim_get import slim_get
+import asyncio
+import schemas
+import crud
 
 
-
-# db = SessionLocal()
-
-# colaoid =AsyncFIFOQueue()
-# alarm = AlarmsFIFO(db)
-
-Af = models.Administered_features
-
-# async def some_database_task():
-#     async with get_db() as db:
-#         yield db
-        
-async def get_db():
-    async with SessionLocal() as db:
-        yield db
+history = HistoryFIFOQueue()
+alarm = AlarmFIFOQueue()
 
 
 async def Totalagentes(id_agent: int, ip_agent: str):
-    async for db in get_db():
-        try:
-            TIMES = []
-            OIDS = []
-            IDF = []
+    try:
+        TIMES = []
+        OIDS = []
+        IDF = []
 
-            intervalos = (
-                (
-                    await db.execute(
-                        select(Af.timer)
-                        .filter(
-                            Af.id_agent == id_agent,
-                            Af.oid != "",
-                        )
-                        .distinct()
-                    )
-                )
-                .scalars()
-                .all()
-            )
+        intervalos = await crud.get_unique_times(id_agent)
+        print(intervalos)
+        for inter in intervalos:
+            TIMES.append(inter)
+            features = await crud.get_features_oid(inter, id_agent)
 
-            for inter in intervalos:
-                TIMES.append(inter)
-                features = (
-                    await db.execute(
-                        select(Af.oid, Af.id_adminis).filter(
-                            Af.timer == f"{inter}",
-                            Af.id_agent == id_agent,
-                            Af.oid != "",
-                        )
-                    )
-                ).all()
+            OIDS.append([item.oid for item in features])
+            IDF.append([item.id_adminis for item in features])
 
-                OIDS.append([item.oid for item in features])
-                IDF.append([item.id_adminis for item in features])
-
-            return schemas.elements(
-                **{"ID": id_agent, "IP": ip_agent, "TIMES": TIMES, "OIDS": OIDS, "IDF": IDF}
-            )
-        except Exception:
-            print('aglo paso en TotalAgentes')
-        finally:
-            pass
-            # await db.close()
+        return schemas.elements(
+            **{"ID": id_agent, "IP": ip_agent, "TIMES": TIMES, "OIDS": OIDS, "IDF": IDF}
+        )
+    except Exception:
+        print("aglo paso en TotalAgentes")
 
 
 async def Get_SNMP(task: schemas.taskoid):
+    numgets = 0
     while True:
-        async for db in get_db():        
+        try:
+            state = await Ping().getstate(task.ID)
+            if state:
+                varbinds = await slim_get("public", task.IP, 161, *task.OIDS)
+                if varbinds:
+                    numgets += 1
+                    for cosa, id in zip(varbinds, task.IDF):
+                        _, value = cosa
+
+                        datos = {
+                            "id_agent": task.ID,
+                            "id_adminis": id,
+                            "value": round(float(value), 3),
+                        }
+
+                        data = schemas.addHistory(**datos)
+                        await history.add(data)
+                        await alarm.add(data)
+
+        except (asyncio.CancelledError, KeyboardInterrupt):
+            print("fallo en OID")
+            await Writer("dsadasdsad")
+            break
+        finally:
             try:
-                state = await Ping().getstate(task.ID)
-                if False:
-                    # print("es verdad y aqui me quedo")
-                    # await asyncio.sleep(task.TIME)
-                    varbinds = await slim_get("public", task.IP, 161, *task.OIDS)
-                    if varbinds:
-                        for cosa, id in zip(varbinds, task.IDF):
-                            _, value = cosa
-                            # print(f"{value}:::::: {id}")
-
-                            datos = {
-                                "id_agent": task.ID,
-                                "id_adminis": id,
-                                "value": round(float(value), 3),
-                            }
-
-                            data = schemas.addHistory(**datos)
-
-                            await AsyncFIFOQueue(db).add(data)
-                            # await colaoid.add(record)
-                            # await alarm.encolar(record)
-                            # await asyncio.sleep(task.TIME)
-               
-            except (asyncio.CancelledError,KeyboardInterrupt):
-                await db.close()
-                print('fallo en OID')
+                print("esperando oid")
+                await asyncio.sleep(task.TIME)
+            except (asyncio.CancelledError, KeyboardInterrupt):
+                Writer(f"id_agent= {task.ID}, id_adminis= {id}, Ejecuciones= {numgets}\n")
                 break
-            finally:
-                try:
-                    print('esperando oid')
-                    await asyncio.sleep(task.TIME)
-                except (asyncio.CancelledError,KeyboardInterrupt):
-                    break
-           
 
 
 class sensorOID:
@@ -127,11 +75,12 @@ class sensorOID:
         self.ip = ip
         self.id = id
         self.tasks = []
-       
+
     async def CreatorTask(self):
         for task in self.tasks:
             task.cancel()
         elements = await Totalagentes(self.id, self.ip)
+        print(elements)
         for TIME, OIDS, IDF in zip(elements.TIMES, elements.OIDS, elements.IDF):
             oid = [ObjectType(ObjectIdentity(f"{oid}")) for oid in OIDS]
             self.tasks.append(
@@ -149,8 +98,10 @@ class sensorOID:
                     )
                 )
             )
+
     async def cancel_oids(self):
         if len(self.tasks) != 0:
             for task in self.tasks:
                 task.cancel()
-        else: return
+        else:
+            return

@@ -1,14 +1,12 @@
-import asyncio
-from collections import deque
-import random
-import models
-from database import SessionLocal
-import crud
 from Utilizables.BotTelegram import sendmessage
+from collections import deque
+import asyncio
+import crud
 
-db=SessionLocal()
 
-class AsyncFIFOQueue:
+
+
+class AlarmFIFOQueue:
     def __init__(self):
         self.queue = deque()
         self.lock = asyncio.Lock()
@@ -26,26 +24,21 @@ class AsyncFIFOQueue:
             async with self.lock:
                 if not self.queue:
                     self.task_running = False
-                    return  # Salir si la cola está vacía
-            
-                # Obtener el primer elemento de la cola
+                    return 
+       
                 item = self.queue.popleft()
             
             print(f"Número en Alrmas: {len(self.queue)}")
             success = await self.execute_task(item)
-            if not success:
-                # Si la tarea no se cumple, reintegrar el elemento a la cola
-                async with self.lock:
-                    self.queue.append(item)
-            else:
+            if success:
                 if item.id_adminis < 100:
                     column = "id_adminis"
                 else:
                     column = "id_sensor"
-                query = await crud.get_administered_feature(db, column, item)
+                query = await crud.get_administered_feature(column, item)
                 message = f"ALARMA ACTIVA \n Sensor : {query.adminis_name} \n "
                 sendmessage(message)
-
+        
             # Esperar un breve momento antes de continuar
             await asyncio.sleep(0.1)
 
@@ -56,27 +49,10 @@ class AsyncFIFOQueue:
             else:
                 column = "id_sensor"
 
-            response = await crud.get_alarms(db, column, data)
+            response = await crud.get_alarms(column, data)
             if response:
                 evaluation = f"{data.value} {response.operation} {response.value}"
-            return eval(evaluation)
+                return eval(evaluation)
         except Exception:
             return False
 
-# async def add_tasks_continuously(fifo_queue):
-#     task_number = 1
-#     while True:
-#         await fifo_queue.add(f"Tarea {task_number}")
-#         task_number += 1
-#         await asyncio.sleep(random.uniform(0.1, 0.5))  # Esperar un tiempo aleatorio antes de agregar la siguiente tarea
-
-# async def main():
-#     fifo_queue = AsyncFIFOQueue()
-    
-#     # Iniciar la tarea que agrega elementos a la cola continuamente
-#     asyncio.create_task(add_tasks_continuously(fifo_queue))
-
-#     await asyncio.sleep(30)  # Dejar que las tareas se procesen
-
-# # Ejecutar el programa
-# asyncio.run(main())
