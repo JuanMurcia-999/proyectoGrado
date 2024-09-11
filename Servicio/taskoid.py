@@ -59,14 +59,12 @@ async def Get_SNMP(task: schemas.taskoid):
 
         except (asyncio.CancelledError, KeyboardInterrupt):
             print("fallo en OID")
-            await Writer("dsadasdsad")
             break
         finally:
             try:
-                print("esperando oid")
-                await asyncio.sleep(task.TIME)
+                await asyncio.sleep(task.TIME*60)
             except (asyncio.CancelledError, KeyboardInterrupt):
-                Writer(f"id_agent= {task.ID}, id_adminis= {id}, Ejecuciones= {numgets}\n")
+                Writer(f"id_agent= {task.ID}, id_adminis= {id}, Ejecuciones= {numgets*len(task.OIDS)} Timer = {task.TIME}\n")
                 break
 
 

@@ -4,8 +4,6 @@ import asyncio
 import crud
 
 
-
-
 class AlarmFIFOQueue:
     def __init__(self):
         self.queue = deque()
@@ -24,22 +22,11 @@ class AlarmFIFOQueue:
             async with self.lock:
                 if not self.queue:
                     self.task_running = False
-                    return 
-       
+                    return
                 item = self.queue.popleft()
-            
+
             print(f"Número en Alrmas: {len(self.queue)}")
-            success = await self.execute_task(item)
-            if success:
-                if item.id_adminis < 100:
-                    column = "id_adminis"
-                else:
-                    column = "id_sensor"
-                query = await crud.get_administered_feature(column, item)
-                message = f"ALARMA ACTIVA \n Sensor : {query.adminis_name} \n "
-                sendmessage(message)
-        
-            # Esperar un breve momento antes de continuar
+            await self.execute_task(item)
             await asyncio.sleep(0.1)
 
     async def execute_task(self, data):
@@ -49,10 +36,18 @@ class AlarmFIFOQueue:
             else:
                 column = "id_sensor"
 
-            response = await crud.get_alarms(column, data)
-            if response:
-                evaluation = f"{data.value} {response.operation} {response.value}"
-                return eval(evaluation)
+            responses = await crud.get_alarms(column, data)
+            if responses:
+                for response in responses:
+                    evaluation = f"{data.value} {response.operation} {response.value}"
+                    state = eval(evaluation)
+                    if state:
+                        if data.id_adminis < 100:
+                            column = "id_adminis"
+                        else:
+                            column = "id_sensor"
+                        query = await crud.get_administered_feature(column, data)
+                        message = f"ALARMA ACTIVA \n Sensor : {query.adminis_name} \n comparacion: {evaluation} "
+                        sendmessage(message)
         except Exception:
             return False
-

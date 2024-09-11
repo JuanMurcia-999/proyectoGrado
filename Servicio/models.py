@@ -52,7 +52,9 @@ class Agents(Base):
     features = relationship(
         "Administered_features", cascade="all, delete", back_populates="agent"
     )
-
+    history =relationship("History_features" ,cascade='all, delete' )
+    Alarms =relationship("Alarms" ,cascade='all, delete' )
+    Actives = relationship("Active_default" , cascade='all,delete')
 
 class Administered_features(Base):
     __tablename__ = "administered_features"
@@ -65,7 +67,7 @@ class Administered_features(Base):
     timer = Column(Integer, nullable=False)
 
     agent = relationship("Agents", back_populates="features")
-
+    alarms = relationship('Alarms', back_populates="administered_feature", cascade="all, delete, delete-orphan")
 
 class Default_features(Base):
     __tablename__ = "default_features"
@@ -96,10 +98,9 @@ class History_features(Base):
     id_agent = Column(Integer, ForeignKey("agents.id_agent"), nullable=False)
     id_adminis = Column(Integer, ForeignKey("administered_features.id_adminis"), nullable=False)
     value = Column(Float, nullable=False)
-    
-    # Cambiar para usar func.now() en lugar de datetime.now()
-    date = Column(Date, default=func.current_date())  # Usa la fecha actual
-    time = Column(Time, default=func.current_time())  # Usa la hora actual
+  
+    date = Column(String)  
+    time = Column(String)  
 
     agent = relationship("Agents")
     feature = relationship("Administered_features")
@@ -110,8 +111,10 @@ class Alarms(Base):
 
     id_alarm = Column(Integer, autoincrement=True, primary_key=True)
     id_agent = Column(Integer, ForeignKey("agents.id_agent"), nullable=False)
-    id_adminis = Column(Integer, nullable=True)
+    id_adminis = Column(Integer,ForeignKey("administered_features.id_adminis") ,nullable=True)
     id_sensor = Column(Integer, nullable=True)
     operation = Column(String, nullable=False)
     value = Column(Integer, nullable=False)
     counter = Column(Integer, nullable=True)
+    
+    administered_feature = relationship("Administered_features", back_populates="alarms")

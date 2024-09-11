@@ -1,7 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from typing import Dict, Any
 from datetime import datetime, date, time
-
+from sqlalchemy.sql import func
+from sqlalchemy import Date, Time
 
 
 # esquema de datos para los elementos de la tabla Agents
@@ -113,7 +114,8 @@ class addHistory(BaseModel):
     id_agent: int
     id_adminis: int
     value: Any
-
+    Date: date | str = Field(default_factory=lambda: datetime.now().date().strftime("%Y-%m-%d"))
+    Time: time | str = Field(default_factory=lambda: datetime.now().time().strftime("%H:%M:%S"))
 
 class readHistory(addHistory):
     id_register: int

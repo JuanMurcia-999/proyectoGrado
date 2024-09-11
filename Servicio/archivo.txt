@@ -1,65 +1,15 @@
 
-datestartup = : 2024-09-09 23:33:53.262934
-starttime = 1725942833.2629344
-endtime = 1725942833.2629344
-totaltime = 1161.009813785553
+datestartup = : 2024-09-10 18:16:05.281909
+datestop = : 2024-09-10 19:36:35.228132
+totaltime = 4829.945225477219
 
-id_agent= 1, id_adminis= 102, Ejecuciones= 20
-id_agent= 1, id_adminis= 103, Ejecuciones= 20
-id_agent= 1, id_adminis= 5, Ejecuciones= 58
-id_agent= 2, id_adminis= 102, Ejecuciones= 20
-id_agent= 2, id_adminis= 103, Ejecuciones= 20
-id_agent= 2, id_adminis= 8, Ejecuciones= 57
-id_agent= 1, id_adminis= 100, Ejecuciones= 19
-
-datestartup = : 2024-09-10 00:00:18.423747
-starttime = 1725944418.4237478
-endtime = 1725944418.4237478
-totaltime = 30.49290370941162
-
-id_agent= 1, id_adminis= 102, Ejecuciones= 1
-id_agent= 1, id_adminis= 103, Ejecuciones= 1
-id_agent= 1, id_adminis= 5, Ejecuciones= 2
-id_agent= 2, id_adminis= 102, Ejecuciones= 1
-id_agent= 2, id_adminis= 103, Ejecuciones= 1
-id_agent= 2, id_adminis= 8, Ejecuciones= 2
-id_agent= 1, id_adminis= 100, Ejecuciones= 1
-
-datestartup = : 2024-09-10 00:00:55.243102
-starttime = 1725944455.2450995
-endtime = 1725944455.2450995
-totaltime = 14.73966670036316
-
-id_agent= 1, id_adminis= 102, Ejecuciones= 1
-id_agent= 1, id_adminis= 103, Ejecuciones= 1
-id_agent= 1, id_adminis= 5, Ejecuciones= 1
-id_agent= 2, id_adminis= 102, Ejecuciones= 1
-id_agent= 2, id_adminis= 103, Ejecuciones= 1
-id_agent= 2, id_adminis= 8, Ejecuciones= 1
-id_agent= 1, id_adminis= 100, Ejecuciones= 1
-
-datestartup = : 2024-09-10 00:02:32.365671
-starttime = 1725944552.366671
-endtime = 1725944552.366671
-totaltime = 51.137813568115234
-
-id_agent= 1, id_adminis= 102, Ejecuciones= 1
-id_agent= 1, id_adminis= 103, Ejecuciones= 1
-id_agent= 1, id_adminis= 5, Ejecuciones= 3
-id_agent= 2, id_adminis= 102, Ejecuciones= 1
-id_agent= 2, id_adminis= 103, Ejecuciones= 1
-id_agent= 2, id_adminis= 8, Ejecuciones= 3
-id_agent= 1, id_adminis= 100, Ejecuciones= 1
-
-datestartup = : 2024-09-10 00:03:41.961082
-starttime = 1725944621.9610825
-dsadasdsadendtime = 1725944621.9610825
-totaltime = 58.69079661369324
-
-id_agent= 1, id_adminis= 102, Ejecuciones= 1
-id_agent= 1, id_adminis= 103, Ejecuciones= 1
-id_agent= 1, id_adminis= 5, Ejecuciones= 3
-id_agent= 2, id_adminis= 102, Ejecuciones= 1
-id_agent= 2, id_adminis= 103, Ejecuciones= 1
-id_agent= 2, id_adminis= 8, Ejecuciones= 3
-id_agent= 1, id_adminis= 100, Ejecuciones= 1
+id_agent= 1, id_adminis= 102, Ejecuciones= 80
+id_agent= 1, id_adminis= 103, Ejecuciones= 80
+id_agent= 1, id_adminis= 104, Ejecuciones= 80
+id_agent= 1, id_adminis= 105, Ejecuciones= 78
+id_agent= 1, id_adminis= 106, Ejecuciones= 80
+id_agent= 1, id_adminis= 21, Ejecuciones= 1120 Timer = 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 672 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 79
+id_agent= 2, id_adminis= 103, Ejecuciones= 47
+id_agent= 2, id_adminis= 102, Ejecuciones= 47

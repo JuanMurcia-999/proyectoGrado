@@ -13,20 +13,22 @@ alarm =  AlarmFIFOQueue()
 class Ping:
     agentes = {}
     states = {}
-
+    tasks = []
     async def Exectping(self):
-        
         while True:
-            tasks = []
-
-            for id, ip in self.agentes.items():
-                tasks.append(self.ping_and_update_state(id, ip))
-            await asyncio.gather(*tasks)
+            try:
+                
+                for id, ip in self.agentes.items():
+                    self.tasks.append(self.ping_and_update_state(id, ip))
+                await asyncio.gather(*self.tasks)
+            except (asyncio.CancelledError,KeyboardInterrupt):
+                break
            
     async def ping_and_update_state(self, id, ip):
         while True:
             state = await asyncio.to_thread(self.ping_host, ip)
             self.states[id] = state
+            print(self.states)
             await asyncio.sleep(2)
 
     def ping_host(self, ip):
@@ -41,9 +43,9 @@ class Ping:
             
 
     async def addagent(self, id, ip):
-        self.agentes[id] = ip
-        self.states[id] = False
-        # print(self.agentes)
+            self.agentes[id] = ip
+            self.states[id] = False
+         
 
     async def getstate(self, id):
         # return self.states.get(id)
@@ -66,7 +68,7 @@ class AnchoBanda:
     def __init__(self, Config: schemas.ConfigAnchoBanda) -> None:
         self.ip = Config.ip
         self.Num_Interface = Config.Num_Interface
-        self.intervalo = Config.intervalo
+        self.intervalo = Config.intervalo*60
         self.id_adminis = Config.id_adminis
         self.id = Config.id
 

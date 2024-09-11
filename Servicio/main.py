@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from Utilizables.Gestionables import *
 from Utilizables.Manageable import *
 from Utilizables.ifTable import interfaceTable
-from Utilizables.Register import Writer
+from Utilizables.Register import Writer,Read
 from fastapi import Depends, FastAPI, HTTPException
 
 from contextlib import asynccontextmanager
@@ -26,18 +26,16 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     await create_instance_startup()
-    asyncio.create_task(Ping().Exectping())
+    # asyncio.create_task(Ping().Exectping())
     print("Lifespan function finished")
-
+    await Read()
     try:
         Writer(f"\ndatestartup = : {datetime.now()}\n")
         start_time = time.time()
-        Writer(f"starttime = {start_time}\n")
-
         yield
     finally:
         end_time = time.time()
-        Writer(f"endtime = {start_time}\n")
+        Writer(f"datestop = : {datetime.now()}\n")
         Writer(f"totaltime = {end_time - start_time}\n\n")
         await Exit_service()
 
@@ -57,7 +55,7 @@ async def create_instance_startup():
         agents = await crud.get_all_agent(db=db)
     for agent in agents:
 
-        await Ping().addagent(agent.id_agent, agent.ip_address)
+        # await Ping().addagent(agent.id_agent, agent.ip_address)
         instance = await create_instance_from_Manageable(agent)
         instances[agent.ag_name] = instance
         await instance.task_oid()
@@ -90,17 +88,19 @@ async def activator_tasks(name: str, nametask: str, params):
             "NumProccesses": instance.NumProccesses,
             "MemorySize": instance.MemorySize,
             "Networktraffic": instance.Networktraffic,
-            "Networktraffic": instance.Networktraffic,
             "MemoryUsed": instance.MemoryUsed,
             "CpuUsed": instance.CpuUsed,
             "DiskUsed": instance.DiskUsed,
         }
 
-    elif isinstance(instance, (ManageablePC, ManageableRT)):
+    elif isinstance(instance, (ManageablePC)):
         task_mapping = {
             "NumProccesses": instance.NumProccesses,
             "MemorySize": instance.MemorySize,
             "Networktraffic": instance.Networktraffic,
+        }
+    elif isinstance(instance, (ManageableRT)):
+        task_mapping = {
             "Networktraffic": instance.Networktraffic,
         }
     task_func = task_mapping.get(nametask)
@@ -108,7 +108,6 @@ async def activator_tasks(name: str, nametask: str, params):
         print(f"Tarea no encontrada: {nametask}")
         raise HTTPException(status_code=400, detail="Tarea no encontrada")
     try:
-        # Asumiendo que todas las tareas manejan parámetros similares
         params = params
         if nametask in [
             "NumProccesses",
@@ -162,6 +161,8 @@ async def delete_agent(
 ):
     db_agent = await crud.delete_agent(db=db, field=field.name, value=value)
     if db_agent:
+        instance = instances.get(db_agent.ag_name)
+        await instance.cancel_end()
         del instances[db_agent.ag_name]
         await Ping().deleteagent(db_agent.id_agent)
         raise HTTPException(status_code=200, detail="agente eliminado")
