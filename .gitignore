@@ -1,1 +1,12 @@
-env
+.env
+copypaste.py
+/Servicio/archivo.txt
+/Servicio/GestorDB.sqlite
+
+
+
+*.log
+*.pot
+*.pyc
+__pycache__/
+.pytest_cache

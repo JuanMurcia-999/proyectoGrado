@@ -45,13 +45,16 @@ class Abtraciones:
             self.names[id_adminis[0]] = "General"
             for id in range(1, len(id_adminis)):
                 self.names[id_adminis[id]] = f"Core{id}"
+            print(self.names)
             for id, name in self.names.items():
-
-                B = await crud.get_B_cpu(filter)
+                
+                B = await crud.get_B_cpu(filter,id)
 
                 values = [item.value for item in B]
-                time = [item.time.strftime("%H:%M:%S") for item in B]
-                date = [item.date.strftime("%Y-%m-%d") for item in B]
+                # time = [item.time.strftime("%H:%M:%S") for item in B]
+                # date = [item.date.strftime("%Y-%m-%d") for item in B]
+                time = [item.time for item in B]
+                date = [item.date for item in B]
                 self.base.append(
                     {
                         "name": name,
@@ -88,8 +91,11 @@ class Abtraciones:
 
             for id, data in zip(ids, (In, Out)):
                 values = [item.value for item in data]
-                time = [item.time.strftime("%H:%M:%S") for item in data]
-                date = [item.date.strftime("%Y-%m-%d") for item in data]
+                time = [item.time for item in data]
+                date = [item.date for item in data]
+                # time = [item.time.strftime("%H:%M:%S") for item in data]
+                # date = [item.date.strftime("%Y-%m-%d") for item in data]
+                
 
                 self.base.append(
                     {

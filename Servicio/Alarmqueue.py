@@ -25,7 +25,7 @@ class AlarmFIFOQueue:
                     return
                 item = self.queue.popleft()
 
-            print(f"Número en Alrmas: {len(self.queue)}")
+            # print(f"Número en Alrmas: {len(self.queue)}")
             await self.execute_task(item)
             await asyncio.sleep(0.1)
 

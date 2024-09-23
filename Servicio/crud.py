@@ -15,7 +15,7 @@ Ad = models.Active_default
 Hf = models.History_features
 Df = models.Default_features
 Al = models.Alarms
-
+Ts = models.Traps
 
 # # Peticion que retorna todos los agentes en la base de datos
 # -------------------------------------------------------------------------------------------AGENTS
@@ -222,32 +222,36 @@ async def get_history_filter(db: AsyncSession, filter: schemas.filterHistory):
     else:
         condition = filter.id_sensor
         column = "id_sensor"
-
+    print(filter)
     try:
-
         result = await db.execute(
             select(Hf.value, Hf.time, Hf.date)
-            .filter(and_(Hf.id_agent == filter.id_agent, Hf.id_adminis == condition))
+            .filter(and_(Hf.id_agent == filter.id_agent, 
+                         Hf.id_adminis == condition,
+                        func.DATE(Hf.date) == func.DATE(f'{filter.datebase}' ,f'{filter.daterange}'),
+                        func.TIME(Hf.time) >= func.TIME('now', f'{filter.timerange}')))
             .order_by(Hf.date.asc())
             .limit(filter.limit)
             .offset(filter.offset)
         )
         response = result.fetchall()
-
         name_result = await db.execute(
             select(Af.adminis_name).filter(getattr(Af, column) == condition)
         )
-        # print(name_result.first().adminis_name)
-        namesensor = name_result.scalar_one_or_none()
+        namesensor=name_result.first().adminis_name
         if response != [] and name_result != None:
+   
+ 
             values = [item.value for item in response]
-            time = [item.time.strftime("%H:%M:%S") for item in response]
-            date = [item.date.strftime("%Y-%m-%d") for item in response]
-
+            # print(values)
+            time = [item.time for item in response]
+            # print(time)
+            date = [item.date for item in response]
+            # print(date)
             minimum = min(values)
             maximus = max(values)
             average = sum(values) / len(values)
-
+           
             return {
                 "data": {
                     "datagrafic": [
@@ -268,7 +272,6 @@ async def get_history_filter(db: AsyncSession, filter: schemas.filterHistory):
         else:
             return Faile
     except Exception as e:
-
         return Faile
 
 
@@ -561,10 +564,11 @@ async def get_A_cpu(date):
             print("fallo get_A_cpu")
 
 
-async def get_B_cpu(filter: schemas.filterHistory):
+async def get_B_cpu(filter: schemas.filterHistory,id):
+  
     async for db in get_db():
         try:
-            return (
+            valor= (
                 await db.execute(
                     select(Hf.value, Hf.time, Hf.date)
                     .filter(and_(Hf.id_agent == filter.id_agent, Hf.id_adminis == id))
@@ -573,7 +577,7 @@ async def get_B_cpu(filter: schemas.filterHistory):
                     .offset(filter.offset)
                 )
             ).all()
-
+            return valor
         except Exception:
             print("fallo get_B_cpu")
 
@@ -597,3 +601,16 @@ async def get_B_network(filter: schemas.filterHistory, ids):
             ).all()
         except Exception:
             print("fallo get_B_network")
+
+
+#------------------------------------------------------------------------------------Traps
+
+async def get_all_traps(db: AsyncSession):
+    result = await db.execute(select(Ts))  
+    return result.scalars().all()  
+
+
+async def get_trap_message(value, db: AsyncSession):
+    result = await db.execute(select(Ts.message).filter(Ts.id_alarm == value))  
+    valor = result.scalar_one_or_none()  
+    return valor

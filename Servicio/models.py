@@ -16,6 +16,7 @@ from enum import Enum
 
 # Definición de los modelos de datos extras
 
+
 # Eliminación de agente según columna
 class ModelField(str, Enum):
     id_agent = "ID"
@@ -52,9 +53,10 @@ class Agents(Base):
     features = relationship(
         "Administered_features", cascade="all, delete", back_populates="agent"
     )
-    history =relationship("History_features" ,cascade='all, delete' )
-    Alarms =relationship("Alarms" ,cascade='all, delete' )
-    Actives = relationship("Active_default" , cascade='all,delete')
+    history = relationship("History_features", cascade="all, delete", back_populates="agent")
+    Alarms = relationship("Alarms", cascade="all, delete")
+    Actives = relationship("Active_default", cascade="all,delete",back_populates="agents")
+
 
 class Administered_features(Base):
     __tablename__ = "administered_features"
@@ -67,7 +69,12 @@ class Administered_features(Base):
     timer = Column(Integer, nullable=False)
 
     agent = relationship("Agents", back_populates="features")
-    alarms = relationship('Alarms', back_populates="administered_feature", cascade="all, delete, delete-orphan")
+    alarms = relationship(
+        "Alarms",
+        back_populates="administered_feature",
+        cascade="all, delete, delete-orphan",
+    )
+
 
 class Default_features(Base):
     __tablename__ = "default_features"
@@ -81,14 +88,16 @@ class Default_features(Base):
 
 class Active_default(Base):
     __tablename__ = "active_default"
-    
+
     id_active = Column(Integer, autoincrement=True, primary_key=True)
-    id_feature = Column(Integer, ForeignKey("default_features.id_feature"), nullable=False)
+    id_feature = Column(
+        Integer, ForeignKey("default_features.id_feature"), nullable=False
+    )
     id_agent = Column(Integer, ForeignKey("agents.id_agent"), nullable=False)
     params = Column(Text, nullable=True)
 
     features = relationship("Default_features")
-    agents = relationship("Agents")
+    agents = relationship("Agents" , back_populates="Actives")
 
 
 class History_features(Base):
@@ -96,13 +105,15 @@ class History_features(Base):
 
     id_register = Column(Integer, autoincrement=True, primary_key=True)
     id_agent = Column(Integer, ForeignKey("agents.id_agent"), nullable=False)
-    id_adminis = Column(Integer, ForeignKey("administered_features.id_adminis"), nullable=False)
+    id_adminis = Column(
+        Integer, ForeignKey("administered_features.id_adminis"), nullable=False
+    )
     value = Column(Float, nullable=False)
-  
-    date = Column(String)  
-    time = Column(String)  
 
-    agent = relationship("Agents")
+    date = Column(String)
+    time = Column(String)
+
+    agent = relationship("Agents", back_populates="history")
     feature = relationship("Administered_features")
 
 
@@ -111,10 +122,23 @@ class Alarms(Base):
 
     id_alarm = Column(Integer, autoincrement=True, primary_key=True)
     id_agent = Column(Integer, ForeignKey("agents.id_agent"), nullable=False)
-    id_adminis = Column(Integer,ForeignKey("administered_features.id_adminis") ,nullable=True)
+    id_adminis = Column(
+        Integer, ForeignKey("administered_features.id_adminis"), nullable=True
+    )
     id_sensor = Column(Integer, nullable=True)
     operation = Column(String, nullable=False)
     value = Column(Integer, nullable=False)
     counter = Column(Integer, nullable=True)
-    
-    administered_feature = relationship("Administered_features", back_populates="alarms")
+
+    administered_feature = relationship(
+        "Administered_features", back_populates="alarms"
+    )
+
+class Traps(Base):
+    __tablename__ = "traps"
+
+    id_alarm = Column(Integer, autoincrement=True, primary_key=True)
+    ip = Column(String, nullable=False)
+    message = Column(Text, nullable=True)
+    date = Column(Date, server_default=func.current_date())
+    time = Column(Time, server_default=func.current_time())

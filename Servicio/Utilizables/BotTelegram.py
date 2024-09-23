@@ -1,16 +1,10 @@
 import requests
+from settings import Settings
 
-
-TOKEN = "7185760712:AAGz1-hK22zzC8X9r8KKtqjBxVOx1NSVCR4"
-CHAT_ID = "-1002147532737"
-
-mensaje='Funcione perro'
+settings = Settings()
 
 def sendmessage(mensaje):
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    payload = {"chat_id": CHAT_ID, "text": mensaje}
+    url = f"https://api.telegram.org/bot{settings.TOKENTELEGRAM}/sendMessage"
+    payload = {"chat_id": settings.CHAT_ID, "text": mensaje}
     response = requests.post(url, data=payload)
     return response.json()
-
-
-

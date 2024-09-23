@@ -18,7 +18,7 @@ import json
 from datetime import datetime
 import time
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from slim.slim_set import Set
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -130,13 +130,13 @@ async def activator_tasks(name: str, nametask: str, params):
 
 
 # recuepra la informacion de todos los agentes
-@app.get("/agents/all/")
+@app.get("/agents/all/" , tags=["AGENTS"])
 async def read_agents(db: AsyncSession = Depends(get_db)):
     return await crud.get_all_agent(db=db)
 
 
 # Agregar agente
-@app.post("/agents/create/")
+@app.post("/agents/create/", tags=["AGENTS"])
 async def create_agent(agent: schemas.CreateAgent, db: AsyncSession = Depends(get_db)):
     id_agent = await crud.create_agent(db=db, agent=agent)
     if id_agent:
@@ -155,7 +155,7 @@ async def create_agent(agent: schemas.CreateAgent, db: AsyncSession = Depends(ge
 
 
 # elimina agentes
-@app.delete("/agents/delete/{field}")
+@app.delete("/agents/delete/{field}", tags=["AGENTS"])
 async def delete_agent(
     field: models.ModelField, value, db: AsyncSession = Depends(get_db)
 ):
@@ -174,19 +174,19 @@ async def delete_agent(
 
 
 # Recuepra todas las features(Home)
-@app.get("/agents/features/all/", response_model=list[schemas.FeatureswithAgent])
+@app.get("/agents/features/all/", tags=["FEATURES"],response_model=list[schemas.FeatureswithAgent])
 async def get_all_features(db: AsyncSession = Depends(get_db)):
     return await crud.get_all_features(db=db)
 
 
 # recupera todas las features segun el agente(View: Sesnor) response_model=list[schemas.FeatureswithAgent]
-@app.get("/agents/features/agent/{ID}", response_model=list[schemas.FeatureswithAgent])
+@app.get("/agents/features/agent/{ID}", tags=["FEATURES"],  response_model=list[schemas.FeatureswithAgent])
 async def get_features_agent(ID, db: AsyncSession = Depends(get_db)):
     return await crud.get_all_features_agent(db=db, value=ID)
 
 
 # crea nuevas features(OID)
-@app.post("/agents/features/new/")
+@app.post("/agents/features/new/", tags=["FEATURES"])
 async def new_feature(
     feature: schemas.new_features, db: AsyncSession = Depends(get_db)
 ):
@@ -199,7 +199,7 @@ async def new_feature(
 
 
 # Elimina las features
-@app.delete("/features/delete/")
+@app.delete("/features/delete/" ,tags=["FEATURES"])
 async def delete_feature(id: int, nametask: str, db: AsyncSession = Depends(get_db)):
     instance = instances.get(nametask)
     state = await crud.delete_feature(db=db, id=id)
@@ -212,7 +212,7 @@ async def delete_feature(id: int, nametask: str, db: AsyncSession = Depends(get_
 
 
 # Recupera la iftable del agente en cuestion  (View : Info)
-@app.get("/iftable/{host}", response_model=list[schemas.iftable])
+@app.get("/iftable/{host}", tags=["ADICIONALES"],response_model=list[schemas.iftable])
 async def read_agents(host: str):
     community = "public"
     salida = await interfaceTable(community, host)
@@ -221,12 +221,32 @@ async def read_agents(host: str):
     else:
         raise HTTPException(status_code=400, detail="No se puede adquirir la iftable")
 
+@app.post("/snmp/set/")
+async def new_feature(operation: schemas.operation):
+    state = await  Set('public',operation.ip,161,operation.oid,operation.value)
+    if not state:
+        raise HTTPException(status_code=400, detail="ya existe o esta desconectado")
+    
+
+@app.post("/snmp/get/")
+async def new_feature(operation: schemas.operation):
+    print(operation)
+    oid =  ObjectType(ObjectIdentity(operation.oid))
+    state = await slim_get('public', operation.ip,161,oid )
+    if state:
+        _,value=state[0]
+        return value
+    else:
+        raise HTTPException(status_code=400, detail="ya existe o esta desconectado")
+
+
+
 
 # # --------------------------------------------------------------------------------HISTORIAL
 
 
 # Obtener el historial segun el sensor (OID)
-@app.post("/history/sensor/")
+@app.post("/history/sensor/",tags=["ADICIONALES"])
 async def read_history_sensor(
     filter: schemas.getHistory, db: AsyncSession = Depends(get_db)
 ):
@@ -236,7 +256,7 @@ async def read_history_sensor(
         return await crud.get_history_sensor(db=db, filter=filter)
 
 
-@app.post("/history/filter/")
+@app.post("/history/filter/",tags=["ADICIONALES"])
 async def read_history_sensor(
     filter: schemas.filterHistory, db: AsyncSession = Depends(get_db)
 ):
@@ -252,21 +272,21 @@ async def read_history_sensor(
 # # -----------------------------------------------------------------------------------GESTIONABLES
 
 
-@app.get("/features/default/agent/", response_model=list[schemas.ReadDefaultFeature])
+@app.get("/features/default/agent/", tags=["GESTIONABLES"], response_model=list[schemas.ReadDefaultFeature])
 async def get_deafult_feature_agent(
     id: int, type: int, db: AsyncSession = Depends(get_db)
 ):
     return await crud.get_default_features_agent(db=db, id=id, type=type)
 
 
-@app.get("/feature/default/active/", response_model=list[schemas.ReadDefaultFeature])
+@app.get("/feature/default/active/", tags=["GESTIONABLES"], response_model=list[schemas.ReadDefaultFeature])
 async def get_deafult_feature_agent(
     id: int, type: int, db: AsyncSession = Depends(get_db)
 ):
     return await crud.get_active_default(db=db, id=id, type=type)
 
 
-@app.post("/exect-task/")
+@app.post("/exect-task/",tags=["GESTIONABLES"])
 async def create_instance(
     request: schemas.Manageable, db: AsyncSession = Depends(get_db)
 ):
@@ -313,7 +333,7 @@ async def create_instance(
 
 
 # Deteenr una de las atreas por defautl
-@app.post("/task/stop/")
+@app.post("/task/stop/", tags=["GESTIONABLES"])
 async def stop_instance(
     request: schemas.Manageable, db: AsyncSession = Depends(get_db)
 ):
@@ -340,13 +360,13 @@ async def stop_instance(
 
 
 # Eliminar alarmas
-@app.get("/alarms/all/", response_model=list[schemas.readAlarm])
+@app.get("/alarms/all/", tags=["ALARMS"],response_model=list[schemas.readAlarm])
 async def read_agents(id_agent: int, db: AsyncSession = Depends(get_db)):
     return await crud.get_alarm(db=db, id_agent=id_agent)
 
 
 # Eliminar las alarmas
-@app.delete("/alarms/delete/")
+@app.delete("/alarms/delete/",tags=["ALARMS"])
 async def delete_feature(id: int, db: AsyncSession = Depends(get_db)):
     state = await crud.delete_alarm(db=db, id_alarm=id)
     if state:
@@ -356,11 +376,24 @@ async def delete_feature(id: int, db: AsyncSession = Depends(get_db)):
 
 
 # Crear alarmas
-@app.post("/alarms/new/")
+@app.post("/alarms/new/",tags=["ALARMS"])
 async def new_alarm(alarm: schemas.newAlarm, db: AsyncSession = Depends(get_db)):
     state = await crud.add_alarm(db=db, alarm=alarm)
     if state:
         raise HTTPException(status_code=200, detail="Alarma agregada")
+
+
+
+#---------------------------------------------------------------------------------------------------- Traps
+
+@app.get("/traps/all/")
+async def get_traps(db: AsyncSession = Depends(get_db)):
+    return await crud.get_all_traps(db=db)
+
+@app.get("/traps/message/{ID}")
+async def get_trap_message(ID, db: AsyncSession = Depends(get_db)):
+    return await crud.get_trap_message(db=db, value=ID)
+
 
 
 # # --------------------------------------------------------------------------------------------------WebSocket

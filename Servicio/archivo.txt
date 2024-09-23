@@ -1,15 +1,838 @@
 
-datestartup = : 2024-09-10 18:16:05.281909
-datestop = : 2024-09-10 19:36:35.228132
-totaltime = 4829.945225477219
+datestartup = : 2024-09-20 09:59:32.528963
+datestop = : 2024-09-20 10:01:39.617094
+totaltime = 127.08711767196655
 
-id_agent= 1, id_adminis= 102, Ejecuciones= 80
-id_agent= 1, id_adminis= 103, Ejecuciones= 80
-id_agent= 1, id_adminis= 104, Ejecuciones= 80
-id_agent= 1, id_adminis= 105, Ejecuciones= 78
-id_agent= 1, id_adminis= 106, Ejecuciones= 80
-id_agent= 1, id_adminis= 21, Ejecuciones= 1120 Timer = 1
-id_agent= 2, id_adminis= 39, Ejecuciones= 672 Timer = 1
-id_agent= 1, id_adminis= 100, Ejecuciones= 79
-id_agent= 2, id_adminis= 103, Ejecuciones= 47
+id_agent= 1, id_adminis= 102, Ejecuciones= 3
+id_agent= 1, id_adminis= 103, Ejecuciones= 3
+id_agent= 1, id_adminis= 21, Ejecuciones= 42 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 3
+id_agent= 2, id_adminis= 103, Ejecuciones= 3
+id_agent= 2, id_adminis= 39, Ejecuciones= 39 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 3
+id_agent= 1, id_adminis= 100, Ejecuciones= 3
+
+datestartup = : 2024-09-20 10:05:38.352565
+datestop = : 2024-09-20 10:06:49.789252
+totaltime = 71.43568754196167
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 2
+id_agent= 1, id_adminis= 103, Ejecuciones= 2
+id_agent= 1, id_adminis= 21, Ejecuciones= 28 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 2
+id_agent= 2, id_adminis= 103, Ejecuciones= 2
+id_agent= 2, id_adminis= 39, Ejecuciones= 26 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 2
+id_agent= 2, id_adminis= 100, Ejecuciones= 2
+
+datestartup = : 2024-09-20 10:06:55.792340
+datestop = : 2024-09-20 10:09:25.063094
+totaltime = 149.26982808113098
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 3
+id_agent= 1, id_adminis= 103, Ejecuciones= 3
+id_agent= 1, id_adminis= 21, Ejecuciones= 42 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 3
+id_agent= 2, id_adminis= 103, Ejecuciones= 3
+id_agent= 2, id_adminis= 39, Ejecuciones= 39 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 3
+id_agent= 2, id_adminis= 100, Ejecuciones= 3
+
+datestartup = : 2024-09-20 10:09:30.496872
+datestop = : 2024-09-20 10:19:57.504681
+totaltime = 627.0072872638702
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 11
+id_agent= 1, id_adminis= 103, Ejecuciones= 11
+id_agent= 1, id_adminis= 21, Ejecuciones= 154 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 11
+id_agent= 2, id_adminis= 103, Ejecuciones= 11
+id_agent= 2, id_adminis= 104, Ejecuciones= 6
+id_agent= 2, id_adminis= 105, Ejecuciones= 6
+id_agent= 2, id_adminis= 106, Ejecuciones= 6
+id_agent= 2, id_adminis= 39, Ejecuciones= 143 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 11
+id_agent= 2, id_adminis= 100, Ejecuciones= 11
+
+datestartup = : 2024-09-20 10:20:03.172021
+datestop = : 2024-09-20 10:24:52.023000
+totaltime = 288.84997844696045
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 5
+id_agent= 1, id_adminis= 103, Ejecuciones= 5
+id_agent= 1, id_adminis= 21, Ejecuciones= 70 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 5
+id_agent= 2, id_adminis= 103, Ejecuciones= 5
+id_agent= 2, id_adminis= 104, Ejecuciones= 5
+id_agent= 2, id_adminis= 105, Ejecuciones= 5
+id_agent= 2, id_adminis= 106, Ejecuciones= 5
+id_agent= 2, id_adminis= 39, Ejecuciones= 65 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 5
+id_agent= 1, id_adminis= 100, Ejecuciones= 5
+
+datestartup = : 2024-09-20 10:24:58.894609
+datestop = : 2024-09-20 10:26:09.865693
+totaltime = 70.96909141540527
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 2
+id_agent= 1, id_adminis= 103, Ejecuciones= 2
+id_agent= 1, id_adminis= 21, Ejecuciones= 28 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 2
+id_agent= 2, id_adminis= 103, Ejecuciones= 2
+id_agent= 2, id_adminis= 104, Ejecuciones= 2
+id_agent= 2, id_adminis= 105, Ejecuciones= 2
+id_agent= 2, id_adminis= 106, Ejecuciones= 2
+id_agent= 2, id_adminis= 39, Ejecuciones= 26 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 2
+id_agent= 2, id_adminis= 100, Ejecuciones= 2
+
+datestartup = : 2024-09-20 10:26:15.098718
+datestop = : 2024-09-20 10:27:13.720524
+totaltime = 58.62080645561218
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 10:27:51.596197
+datestop = : 2024-09-20 10:40:06.714429
+totaltime = 735.1172332763672
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 13
+id_agent= 1, id_adminis= 103, Ejecuciones= 13
+id_agent= 1, id_adminis= 21, Ejecuciones= 182 Timer = 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 13
+id_agent= 2, id_adminis= 106, Ejecuciones= 12
+id_agent= 2, id_adminis= 39, Ejecuciones= 156 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 12
+id_agent= 2, id_adminis= 102, Ejecuciones= 12
+id_agent= 2, id_adminis= 103, Ejecuciones= 12
+id_agent= 1, id_adminis= 100, Ejecuciones= 12
+
+datestartup = : 2024-09-20 10:43:45.601289
+datestop = : 2024-09-20 13:12:40.542191
+totaltime = 8934.939897298813
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 148
+id_agent= 1, id_adminis= 103, Ejecuciones= 148
+id_agent= 1, id_adminis= 21, Ejecuciones= 2072 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 147
+id_agent= 2, id_adminis= 103, Ejecuciones= 147
+id_agent= 2, id_adminis= 104, Ejecuciones= 148
+id_agent= 2, id_adminis= 106, Ejecuciones= 148
+id_agent= 2, id_adminis= 39, Ejecuciones= 1924 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 145
+
+datestartup = : 2024-09-20 13:12:47.821508
+datestop = : 2024-09-20 13:17:18.217886
+totaltime = 270.3953785896301
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 5
+id_agent= 1, id_adminis= 103, Ejecuciones= 5
+id_agent= 1, id_adminis= 21, Ejecuciones= 70 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 5
+id_agent= 2, id_adminis= 103, Ejecuciones= 5
+id_agent= 2, id_adminis= 104, Ejecuciones= 5
+id_agent= 2, id_adminis= 105, Ejecuciones= 5
+id_agent= 2, id_adminis= 106, Ejecuciones= 5
+id_agent= 2, id_adminis= 39, Ejecuciones= 65 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 5
+id_agent= 2, id_adminis= 100, Ejecuciones= 5
+
+datestartup = : 2024-09-20 13:17:22.992402
+datestop = : 2024-09-20 13:30:34.859470
+totaltime = 791.8670682907104
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 14
+id_agent= 1, id_adminis= 103, Ejecuciones= 14
+id_agent= 1, id_adminis= 21, Ejecuciones= 196 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 14
+id_agent= 2, id_adminis= 103, Ejecuciones= 14
+id_agent= 2, id_adminis= 104, Ejecuciones= 14
+id_agent= 2, id_adminis= 105, Ejecuciones= 13
+id_agent= 2, id_adminis= 106, Ejecuciones= 14
+id_agent= 2, id_adminis= 39, Ejecuciones= 182 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 13
+id_agent= 1, id_adminis= 100, Ejecuciones= 13
+
+datestartup = : 2024-09-20 13:30:39.583950
+datestop = : 2024-09-20 13:45:25.978724
+totaltime = 886.3937759399414
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 15
+id_agent= 1, id_adminis= 103, Ejecuciones= 15
+id_agent= 1, id_adminis= 21, Ejecuciones= 210 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 15
+id_agent= 2, id_adminis= 103, Ejecuciones= 15
+id_agent= 2, id_adminis= 104, Ejecuciones= 15
+id_agent= 2, id_adminis= 106, Ejecuciones= 15
+id_agent= 2, id_adminis= 39, Ejecuciones= 195 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 15
+id_agent= 1, id_adminis= 100, Ejecuciones= 15
+
+datestartup = : 2024-09-20 13:45:40.819506
+datestop = : 2024-09-20 14:04:54.935984
+totaltime = 1154.1154792308807
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 20
+id_agent= 1, id_adminis= 103, Ejecuciones= 20
+id_agent= 1, id_adminis= 21, Ejecuciones= 280 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 19
+id_agent= 2, id_adminis= 103, Ejecuciones= 19
+id_agent= 2, id_adminis= 104, Ejecuciones= 20
+id_agent= 2, id_adminis= 106, Ejecuciones= 19
+id_agent= 2, id_adminis= 39, Ejecuciones= 260 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 19
+id_agent= 2, id_adminis= 100, Ejecuciones= 19
+
+datestartup = : 2024-09-20 14:06:38.069084
+datestop = : 2024-09-20 14:06:42.032108
+totaltime = 3.962019681930542
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 14:08:43.094215
+datestop = : 2024-09-20 14:11:36.776292
+totaltime = 173.68107342720032
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 3
+id_agent= 1, id_adminis= 103, Ejecuciones= 3
+id_agent= 1, id_adminis= 21, Ejecuciones= 42 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 3
+id_agent= 2, id_adminis= 103, Ejecuciones= 3
+id_agent= 2, id_adminis= 104, Ejecuciones= 3
+id_agent= 2, id_adminis= 105, Ejecuciones= 3
+id_agent= 2, id_adminis= 106, Ejecuciones= 3
+id_agent= 2, id_adminis= 39, Ejecuciones= 39 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 3
+id_agent= 1, id_adminis= 100, Ejecuciones= 3
+
+datestartup = : 2024-09-20 14:11:41.707302
+datestop = : 2024-09-20 14:13:00.500039
+totaltime = 78.79273676872253
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 2
+id_agent= 1, id_adminis= 103, Ejecuciones= 2
+id_agent= 1, id_adminis= 21, Ejecuciones= 28 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 2
+id_agent= 2, id_adminis= 103, Ejecuciones= 2
+id_agent= 2, id_adminis= 104, Ejecuciones= 2
+id_agent= 2, id_adminis= 105, Ejecuciones= 2
+id_agent= 2, id_adminis= 106, Ejecuciones= 2
+id_agent= 2, id_adminis= 39, Ejecuciones= 26 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 2
+id_agent= 1, id_adminis= 100, Ejecuciones= 2
+
+datestartup = : 2024-09-20 14:13:06.431826
+datestop = : 2024-09-20 14:13:43.332573
+totaltime = 36.900747537612915
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 14:15:34.730048
+datestop = : 2024-09-20 14:15:51.960424
+totaltime = 17.22937250137329
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 14:16:14.280227
+datestop = : 2024-09-20 14:17:59.302857
+totaltime = 105.02163004875183
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 2
+id_agent= 1, id_adminis= 103, Ejecuciones= 2
+id_agent= 1, id_adminis= 104, Ejecuciones= 2
+id_agent= 1, id_adminis= 105, Ejecuciones= 2
+id_agent= 1, id_adminis= 106, Ejecuciones= 2
+id_agent= 1, id_adminis= 21, Ejecuciones= 28 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 2
+id_agent= 2, id_adminis= 103, Ejecuciones= 2
+id_agent= 2, id_adminis= 104, Ejecuciones= 2
+id_agent= 2, id_adminis= 105, Ejecuciones= 2
+id_agent= 2, id_adminis= 106, Ejecuciones= 2
+id_agent= 2, id_adminis= 39, Ejecuciones= 26 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 2
+id_agent= 2, id_adminis= 100, Ejecuciones= 2
+
+datestartup = : 2024-09-20 14:20:37.273691
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+datestop = : 2024-09-20 14:21:28.192844
+totaltime = 50.91915225982666
+
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 14:21:42.704166
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+datestop = : 2024-09-20 14:21:55.935873
+totaltime = 13.23070740699768
+
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 14:22:43.493618
+datestop = : 2024-09-20 14:22:47.684485
+totaltime = 4.189862251281738
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 14:23:09.769641
+id_agent= 1, id_adminis= 102, Ejecuciones= 176
+id_agent= 2, id_adminis= 106, Ejecuciones= 176
+id_agent= 2, id_adminis= 39, Ejecuciones= 2275 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 175
+datestop = : 2024-09-20 17:22:12.472227
+totaltime = 10742.700580835342
+
+id_agent= 1, id_adminis= 21, Ejecuciones= 2464 Timer = 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 177
+id_agent= 2, id_adminis= 103, Ejecuciones= 176
+id_agent= 2, id_adminis= 104, Ejecuciones= 176
+id_agent= 1, id_adminis= 103, Ejecuciones= 177
+id_agent= 1, id_adminis= 106, Ejecuciones= 176
+id_agent= 1, id_adminis= 105, Ejecuciones= 173
+id_agent= 1, id_adminis= 100, Ejecuciones= 175
+id_agent= 2, id_adminis= 100, Ejecuciones= 174
+id_agent= 2, id_adminis= 105, Ejecuciones= 54
+
+datestartup = : 2024-09-20 17:23:02.845573
+datestop = : 2024-09-20 18:16:02.752641
+totaltime = 3179.9060578346252
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 53
+id_agent= 1, id_adminis= 103, Ejecuciones= 53
+id_agent= 1, id_adminis= 104, Ejecuciones= 53
+id_agent= 1, id_adminis= 105, Ejecuciones= 52
+id_agent= 1, id_adminis= 106, Ejecuciones= 53
+id_agent= 1, id_adminis= 21, Ejecuciones= 742 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 53
+id_agent= 2, id_adminis= 103, Ejecuciones= 53
+id_agent= 2, id_adminis= 104, Ejecuciones= 53
+id_agent= 2, id_adminis= 106, Ejecuciones= 53
+id_agent= 2, id_adminis= 105, Ejecuciones= 52
+id_agent= 2, id_adminis= 39, Ejecuciones= 689 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 52
+id_agent= 2, id_adminis= 100, Ejecuciones= 52
+
+datestartup = : 2024-09-20 18:16:08.505978
+datestop = : 2024-09-20 18:16:52.197501
+totaltime = 43.69052052497864
+
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+
+datestartup = : 2024-09-20 18:17:12.742301
+datestop = : 2024-09-20 18:18:09.153093
+totaltime = 56.40979290008545
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 18:18:15.227073
+datestop = : 2024-09-20 18:20:58.265091
+totaltime = 163.03701615333557
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 3
+id_agent= 1, id_adminis= 103, Ejecuciones= 3
+id_agent= 1, id_adminis= 104, Ejecuciones= 3
+id_agent= 1, id_adminis= 105, Ejecuciones= 3
+id_agent= 1, id_adminis= 106, Ejecuciones= 3
+id_agent= 1, id_adminis= 21, Ejecuciones= 42 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 3
+id_agent= 2, id_adminis= 103, Ejecuciones= 3
+id_agent= 2, id_adminis= 104, Ejecuciones= 3
+id_agent= 2, id_adminis= 106, Ejecuciones= 3
+id_agent= 2, id_adminis= 105, Ejecuciones= 3
+id_agent= 2, id_adminis= 39, Ejecuciones= 39 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 3
+id_agent= 1, id_adminis= 100, Ejecuciones= 3
+
+datestartup = : 2024-09-20 18:21:05.935924
+datestop = : 2024-09-20 18:21:28.048399
+totaltime = 22.111475229263306
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 18:21:36.282195
+datestop = : 2024-09-20 18:22:15.655263
+totaltime = 39.37306809425354
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 18:22:21.236983
+datestop = : 2024-09-20 18:22:36.748855
+totaltime = 15.510869979858398
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 18:22:43.038605
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+datestop = : 2024-09-20 18:22:44.492901
+totaltime = 1.454296588897705
+
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 0
+id_agent= 2, id_adminis= 103, Ejecuciones= 0
+id_agent= 2, id_adminis= 105, Ejecuciones= 0
+
+datestartup = : 2024-09-20 18:23:04.809717
+datestop = : 2024-09-20 18:23:25.368028
+totaltime = 20.5573308467865
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 18:23:32.354446
+datestop = : 2024-09-20 18:23:51.793972
+totaltime = 19.439526081085205
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 18:23:59.861866
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+datestop = : 2024-09-20 18:24:02.259667
+totaltime = 2.3968024253845215
+
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 0
+
+datestartup = : 2024-09-20 18:24:16.790362
+datestop = : 2024-09-20 18:24:57.817491
+totaltime = 41.02613019943237
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 18:25:04.054654
+datestop = : 2024-09-20 18:25:08.268056
+totaltime = 4.212404727935791
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 1
+id_agent= 1, id_adminis= 106, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 1
+id_agent= 2, id_adminis= 103, Ejecuciones= 1
+id_agent= 2, id_adminis= 104, Ejecuciones= 1
+id_agent= 2, id_adminis= 106, Ejecuciones= 1
+id_agent= 2, id_adminis= 105, Ejecuciones= 1
+id_agent= 2, id_adminis= 39, Ejecuciones= 13 Timer = 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-20 18:25:13.978232
+datestop = : 2024-09-20 18:26:28.086413
+totaltime = 74.1081805229187
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 2
+id_agent= 1, id_adminis= 103, Ejecuciones= 2
+id_agent= 1, id_adminis= 104, Ejecuciones= 2
+id_agent= 1, id_adminis= 105, Ejecuciones= 2
+id_agent= 1, id_adminis= 106, Ejecuciones= 2
+id_agent= 1, id_adminis= 21, Ejecuciones= 28 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 2
+id_agent= 2, id_adminis= 103, Ejecuciones= 2
+id_agent= 2, id_adminis= 104, Ejecuciones= 2
+id_agent= 2, id_adminis= 106, Ejecuciones= 2
+id_agent= 2, id_adminis= 105, Ejecuciones= 2
+id_agent= 2, id_adminis= 39, Ejecuciones= 26 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 2
+id_agent= 2, id_adminis= 100, Ejecuciones= 2
+
+datestartup = : 2024-09-20 18:26:34.079526
+datestop = : 2024-09-20 18:38:57.396977
+totaltime = 743.3174510002136
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 13
+id_agent= 1, id_adminis= 103, Ejecuciones= 13
+id_agent= 1, id_adminis= 100, Ejecuciones= 12
+id_agent= 1, id_adminis= 104, Ejecuciones= 13
+id_agent= 1, id_adminis= 105, Ejecuciones= 12
+id_agent= 1, id_adminis= 106, Ejecuciones= 13
+id_agent= 1, id_adminis= 21, Ejecuciones= 182 Timer = 1
+id_agent= 2, id_adminis= 102, Ejecuciones= 13
+id_agent= 2, id_adminis= 103, Ejecuciones= 13
+id_agent= 2, id_adminis= 100, Ejecuciones= 12
+id_agent= 2, id_adminis= 104, Ejecuciones= 13
+id_agent= 2, id_adminis= 106, Ejecuciones= 13
+id_agent= 2, id_adminis= 105, Ejecuciones= 12
+id_agent= 2, id_adminis= 39, Ejecuciones= 169 Timer = 1
+
+datestartup = : 2024-09-20 18:39:05.068593
+id_agent= 1, id_adminis= 102, Ejecuciones= 41
+id_agent= 1, id_adminis= 103, Ejecuciones= 41
+id_agent= 1, id_adminis= 21, Ejecuciones= 602 Timer = 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 14 Timer = 1
+id_agent= 1, id_adminis= 51, Ejecuciones= 1 Timer = 5
 id_agent= 2, id_adminis= 102, Ejecuciones= 47
+id_agent= 2, id_adminis= 103, Ejecuciones= 48
+id_agent= 2, id_adminis= 104, Ejecuciones= 48
+id_agent= 2, id_adminis= 106, Ejecuciones= 48
+datestop = : 2024-09-20 19:51:00.318731
+totaltime = 4315.249138832092
+
+id_agent= 1, id_adminis= 104, Ejecuciones= 72
+id_agent= 1, id_adminis= 105, Ejecuciones= 70
+id_agent= 1, id_adminis= 106, Ejecuciones= 72
+id_agent= 1, id_adminis= 102, Ejecuciones= 31
+id_agent= 1, id_adminis= 103, Ejecuciones= 31
+id_agent= 1, id_adminis= 21, Ejecuciones= 364 Timer = 1
+id_agent= 1, id_adminis= 51, Ejecuciones= 6 Timer = 5
+id_agent= 2, id_adminis= 39, Ejecuciones= 871 Timer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 30
+
+datestartup = : 2024-09-23 12:41:55.419901
+
+datestartup = : 2024-09-23 12:41:55.538833
+
+datestartup = : 2024-09-23 12:41:55.556822
+
+datestartup = : 2024-09-23 12:41:55.586805
+datestop = : 2024-09-23 12:42:30.621271
+totaltime = 35.082438707351685
+
+id_agent= 1, id_adminis= 104, Ejecuciones= 0
+id_agent= 1, id_adminis= 105, Ejecuciones= 0
+id_agent= 1, id_adminis= 106, Ejecuciones= 0
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 13 Timer = 1
+id_agent= 1, id_adminis= 51, Ejecuciones= 1 Timer = 5
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+id_agent= 2, id_adminis= 100, Ejecuciones= 0
+
+datestartup = : 2024-09-23 12:44:22.607858
+
+datestartup = : 2024-09-23 12:44:23.052603
+
+datestartup = : 2024-09-23 12:44:23.285469
+
+datestartup = : 2024-09-23 12:44:23.443379
+datestop = : 2024-09-23 12:45:39.960757
+totaltime = 77.35189962387085
+
+id_agent= 1, id_adminis= 104, Ejecuciones= 0
+id_agent= 1, id_adminis= 105, Ejecuciones= 0
+id_agent= 1, id_adminis= 106, Ejecuciones= 0
+id_agent= 1, id_adminis= 102, Ejecuciones= 2
+id_agent= 1, id_adminis= 103, Ejecuciones= 2
+id_agent= 1, id_adminis= 21, Ejecuciones= 26 Timer = 1
+id_agent= 1, id_adminis= 51, Ejecuciones= 1 Timer = 5
+id_agent= 1, id_adminis= 100, Ejecuciones= 2
+id_agent= 2, id_adminis= 100, Ejecuciones= 0
+datestop = : 2024-09-23 12:45:39.990736
+totaltime = 76.93713426589966
+
+totaltime = 76.7042670249939
+
+id_agent= 1, id_adminis= 104, Ejecuciones= 0
+id_agent= 1, id_adminis= 104, Ejecuciones= 0
+id_agent= 1, id_adminis= 105, Ejecuciones= 0
+id_agent= 1, id_adminis= 105, Ejecuciones= 0
+id_agent= 1, id_adminis= 106, Ejecuciones= 0
+id_agent= 1, id_adminis= 106, Ejecuciones= 0
+id_agent= 1, id_adminis= 102, Ejecuciones= 2
+id_agent= 1, id_adminis= 103, Ejecuciones= 2
+id_agent= 1, id_adminis= 21, Ejecuciones= 26 Timer = 1
+id_agent= 1, id_adminis= 51, Ejecuciones= 1 Timer = 5
+id_agent= 1, id_adminis= 102, Ejecuciones= 2
+id_agent= 2, id_adminis= 100, Ejecuciones= 0
+id_agent= 1, id_adminis= 103, Ejecuciones= 2
+id_agent= 1, id_adminis= 103, Ejecuciones= 2
+id_agent= 1, id_adminis= 21, Ejecuciones= 26 Timer = 1
+id_agent= 1, id_adminis= 51, Ejecuciones= 1 Timer = 5
+id_agent= 2, id_adminis= 100, Ejecuciones= 0
+imer = 1
+id_agent= 1, id_adminis= 100, Ejecuciones= 2
+id_agent= 1, id_adminis= 51, Ejecuciones= 1 Timer = 5
+id_agent= 1, id_adminis= 100, Ejecuciones= 2
+id_agent= 2, id_adminis= 100, Ejecuciones= 0
+
+datestartup = : 2024-09-23 12:46:57.284403
+
+datestartup = : 2024-09-23 12:46:57.297398
+
+datestartup = : 2024-09-23 12:46:57.313386
+
+datestartup = : 2024-09-23 12:46:57.405338
+datestop = : 2024-09-23 12:48:22.226179
+totaltime = 84.92778277397156
+
+id_agent= 1, id_adminis= 104, Ejecuciones= 0
+id_agent= 1, id_adminis= 105, Ejecuciones= 0
+id_agent= 1, id_adminis= 106, Ejecuciones= 0
+id_agent= 1, id_adminis= 102, Ejecuciones= 2
+id_agent= 1, id_adminis= 103, Ejecuciones= 2
+id_agent= 1, id_adminis= 21, Ejecuciones= 26 Timer = 1
+id_agent= 1, id_adminis= 51, Ejecuciones= 1 Timer = 5
+id_agent= 2, id_adminis= 100, Ejecuciones= 0
+id_agent= 1, id_adminis= 100, Ejecuciones= 2
+datestop = : 2024-09-23 12:48:22.242169
+totaltime = 84.9277834892273
+
+id_agent= 1, id_adminis= 104, Ejecuciones= 0
+id_agent= 1, id_adminis= 105, Ejecuciones= 0
+id_agent= 1, id_adminis= 106, Ejecuciones= 0
+id_agent= 1, id_adminis= 102, Ejecuciones= 2
+id_agent= 1, id_adminis= 103, Ejecuciones= 2
+id_agent= 1, id_adminis= 21, Ejecuciones= 26 Timer = 1
+id_agent= 1, id_adminis= 51, Ejecuciones= 1 Timer = 5
+id_agent= 2, id_adminis= 100, Ejecuciones= 0
+id_agent= 1, id_adminis= 100, Ejecuciones= 2
+datestop = : 2024-09-23 12:48:32.846924
+totaltime = 95.44059038162231
+
+id_agent= 1, id_adminis= 51, Ejecuciones= 1 Timer = 5
+datestop = : 2024-09-23 12:48:35.446201
+totaltime = 98.15979957580566
+
+id_agent= 1, id_adminis= 51, Ejecuciones= 1 Timer = 5
+
+datestartup = : 2024-09-23 13:30:13.736341
+
+datestartup = : 2024-09-23 13:30:13.766323
+
+datestartup = : 2024-09-23 13:30:13.848277
+
+datestartup = : 2024-09-23 13:30:13.980201
+
+datestartup = : 2024-09-23 13:30:32.795280
+datestop = : 2024-09-23 13:30:34.080715
+totaltime = 1.2844362258911133
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 13 Timer = 1
+id_agent= 1, id_adminis= 51, Ejecuciones= 1 Timer = 5
+id_agent= 2, id_adminis= 100, Ejecuciones= 0
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+id_agent= 1, id_adminis= 104, Ejecuciones= 0
+id_agent= 1, id_adminis= 105, Ejecuciones= 0
+id_agent= 1, id_adminis= 106, Ejecuciones= 0
+
+datestartup = : 2024-09-23 13:32:19.055313
+datestop = : 2024-09-23 13:32:28.694646
+totaltime = 9.638312101364136
+
+id_agent= 1, id_adminis= 104, Ejecuciones= 0
+id_agent= 1, id_adminis= 105, Ejecuciones= 0
+id_agent= 1, id_adminis= 106, Ejecuciones= 0
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 13 Timer = 1
+id_agent= 1, id_adminis= 51, Ejecuciones= 1 Timer = 5
+id_agent= 2, id_adminis= 100, Ejecuciones= 0
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-09-23 13:37:18.462567
+datestop = : 2024-09-23 13:37:20.858715
+totaltime = 2.3951478004455566
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 13 Timer = 1
+id_agent= 1, id_adminis= 51, Ejecuciones= 1 Timer = 5
+id_agent= 1, id_adminis= 104, Ejecuciones= 0
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+id_agent= 1, id_adminis= 106, Ejecuciones= 0
+id_agent= 1, id_adminis= 105, Ejecuciones= 0
+id_agent= 2, id_adminis= 100, Ejecuciones= 0
+
+datestartup = : 2024-09-23 13:39:14.773066
+datestop = : 2024-09-23 13:39:16.398837
+totaltime = 1.624772548675537
+
+id_agent= 1, id_adminis= 102, Ejecuciones= 1
+id_agent= 1, id_adminis= 103, Ejecuciones= 1
+id_agent= 1, id_adminis= 21, Ejecuciones= 13 Timer = 1
+id_agent= 1, id_adminis= 51, Ejecuciones= 1 Timer = 5
+id_agent= 2, id_adminis= 100, Ejecuciones= 0
+id_agent= 1, id_adminis= 106, Ejecuciones= 0
+id_agent= 1, id_adminis= 100, Ejecuciones= 1
+id_agent= 1, id_adminis= 105, Ejecuciones= 0
+id_agent= 1, id_adminis= 104, Ejecuciones= 0

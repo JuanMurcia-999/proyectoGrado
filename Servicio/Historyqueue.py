@@ -31,7 +31,7 @@ class HistoryFIFOQueue:
                
                 item = self.queue.popleft()
 
-            print(f"Número de elementos en la cola: {len(self.queue)}")
+            # print(f"Número de elementos en la cola: {len(self.queue)}")
             if self.countererror < overflow:
                 success = await crud.add_history(item)
             else:
