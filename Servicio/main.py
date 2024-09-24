@@ -9,6 +9,7 @@ from Utilizables.Manageable import *
 from Utilizables.ifTable import interfaceTable
 from Utilizables.Register import Writer,Read
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from contextlib import asynccontextmanager
 import crud, models, schemas
@@ -44,6 +45,13 @@ app = FastAPI(lifespan=lifespan)
 
 instances = {}
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 async def Exit_service():
     for name, proc in instances.items():
