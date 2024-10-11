@@ -113,7 +113,7 @@ class AnchoBanda:
                         in_bps = difInbits / self.intervalo
                         out_bps = difOutbits / self.intervalo
 
-                        [in_kbps, out_kbps] = in_bps / 1000000, out_bps / 1000000
+                        [in_kbps, out_kbps] = in_bps / 1000, out_bps / 1000
 
                         dIn = {
                             "id_agent": self.id,
@@ -135,12 +135,12 @@ class AnchoBanda:
                         await alarm.add(record2)
 
             except (asyncio.CancelledError,KeyboardInterrupt):
-                print('fallo en Network')
                 break
             finally:
                 try:
                     await asyncio.sleep(1)
                 except (asyncio.CancelledError,KeyboardInterrupt):
+                    Writer(f"id_agent= {self.id}, id_adminis= {100}, Ejecuciones= {self.Countgets}\n")
                     break
 
 
@@ -353,13 +353,11 @@ class Processes:
               
             except (asyncio.CancelledError,KeyboardInterrupt):
                 self.forhistory.clear()
-                print('fallo en tasCpuUsed')
                 break
             finally:
                 try:
                     await asyncio.sleep(self.timer)
                 except (asyncio.CancelledError,KeyboardInterrupt):
                     Writer(f"id_agent= {self.id}, id_adminis= {self.id_adminis}, Ejecuciones= {counter}\n")
-                except (asyncio.CancelledError,KeyboardInterrupt):
                     break
 
