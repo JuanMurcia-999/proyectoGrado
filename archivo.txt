@@ -64,3 +64,33 @@ id_agent= 3, id_adminis= 100, Ejecuciones= 0
 id_agent= 7, id_adminis= 100, Ejecuciones= 1
 id_agent= 6, id_adminis= 100, Ejecuciones= 0
 id_agent= 5, id_adminis= 100, Ejecuciones= 1
+
+datestartup = : 2024-10-11 16:04:47.926450
+datestop = : 2024-10-11 16:04:54.543721
+totaltime = 6.616271495819092
+
+id_agent= 3, id_adminis= 104, Ejecuciones= 0
+id_agent= 5, id_adminis= 102, Ejecuciones= 1
+id_agent= 5, id_adminis= 103, Ejecuciones= 1
+id_agent= 5, id_adminis= 112, Ejecuciones= 7 Timer = 1
+id_agent= 7, id_adminis= 102, Ejecuciones= 1
+id_agent= 7, id_adminis= 103, Ejecuciones= 1
+id_agent= 6, id_adminis= 102, Ejecuciones= 0
+id_agent= 3, id_adminis= 103, Ejecuciones= 0
+id_agent= 5, id_adminis= 105, Ejecuciones= 0
+id_agent= 7, id_adminis= 105, Ejecuciones= 0
+id_agent= 6, id_adminis= 104, Ejecuciones= 0
+id_agent= 6, id_adminis= 106, Ejecuciones= 0
+id_agent= 6, id_adminis= 105, Ejecuciones= 0
+id_agent= 3, id_adminis= 105, Ejecuciones= 0
+id_agent= 7, id_adminis= 100, Ejecuciones= 1
+id_agent= 3, id_adminis= 100, Ejecuciones= 0
+id_agent= 7, id_adminis= 104, Ejecuciones= 0
+id_agent= 5, id_adminis= 104, Ejecuciones= 0
+id_agent= 5, id_adminis= 100, Ejecuciones= 1
+id_agent= 6, id_adminis= 103, Ejecuciones= 0
+id_agent= 3, id_adminis= 102, Ejecuciones= 0
+id_agent= 6, id_adminis= 100, Ejecuciones= 0
+id_agent= 5, id_adminis= 106, Ejecuciones= 0
+id_agent= 7, id_adminis= 106, Ejecuciones= 0
+id_agent= 3, id_adminis= 106, Ejecuciones= 0

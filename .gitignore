@@ -1,7 +1,6 @@
 .env
-copypaste.py
-/Servicio/archivo.txt
-/Servicio/GestorDB.sqlite
+archivo.txt
+GestorDB.sqlite
 
 
 
