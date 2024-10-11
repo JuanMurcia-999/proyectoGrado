@@ -8,6 +8,7 @@ from sqlalchemy import (
     Text,
     Numeric,
     Float,
+    DateTime,
 )
 from sqlalchemy.orm import relationship
 from .database import Base
@@ -30,7 +31,6 @@ class ModelFieldSensor(str, Enum):
     id_adminis = "id_adminis"
 
 
-# Definición de la TABLA Agentes (Agents)
 class Types(Base):
     __tablename__ = "types"
 
@@ -41,21 +41,28 @@ class Types(Base):
     defaultfeatures = relationship("Default_features", back_populates="type")
 
 
+# Definición de la TABLA Agentes (Agents)
 class Agents(Base):
-    __tablename__ = "agents"
+    __tablename__ = "agents"  # Definicion del nombre de la tabla
 
+    # Definicion de los campos de tabla expresados en atributos
     id_agent = Column(Integer, autoincrement=True, primary_key=True)
     ag_name = Column(String, nullable=False, unique=True)
     ip_address = Column(String, nullable=False, unique=True)
     ag_type = Column(Integer, ForeignKey("types.id_type"), nullable=False)
 
+    # Definicion de las relaciones entre esta y otras tablas
     type = relationship("Types", back_populates="agents")
     features = relationship(
         "Administered_features", cascade="all, delete", back_populates="agent"
     )
-    history = relationship("History_features", cascade="all, delete", back_populates="agent")
+    history = relationship(
+        "History_features", cascade="all, delete", back_populates="agent"
+    )
     Alarms = relationship("Alarms", cascade="all, delete")
-    Actives = relationship("Active_default", cascade="all,delete",back_populates="agents")
+    Actives = relationship(
+        "Active_default", cascade="all,delete", back_populates="agents"
+    )
 
 
 class Administered_features(Base):
@@ -91,13 +98,18 @@ class Active_default(Base):
 
     id_active = Column(Integer, autoincrement=True)
     id_feature = Column(
-        Integer, ForeignKey("default_features.id_feature"), nullable=False, primary_key=True
+        Integer,
+        ForeignKey("default_features.id_feature"),
+        nullable=False,
+        primary_key=True,
     )
-    id_agent = Column(Integer, ForeignKey("agents.id_agent"), nullable=False, primary_key=True)
+    id_agent = Column(
+        Integer, ForeignKey("agents.id_agent"), nullable=False, primary_key=True
+    )
     params = Column(Text, nullable=True)
 
     features = relationship("Default_features")
-    agents = relationship("Agents" , back_populates="Actives")
+    agents = relationship("Agents", back_populates="Actives")
 
 
 class History_features(Base):
@@ -133,6 +145,7 @@ class Alarms(Base):
     administered_feature = relationship(
         "Administered_features", back_populates="alarms"
     )
+
 
 class Traps(Base):
     __tablename__ = "traps"

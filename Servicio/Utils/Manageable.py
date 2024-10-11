@@ -52,11 +52,6 @@ class ManageableGeneral:
         except asyncio.CancelledError:
             # La tarea fue cancelada, capturamos la excepción
             print(f'Tarea cancelada: {task}')
-    
-    async def cancel_end(self):
-        for name, task in self.tasks.items():
-            task.cancel()
-        await self.instanceoid.cancel_oids()
 
 
 
