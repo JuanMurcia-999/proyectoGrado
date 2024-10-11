@@ -1,9 +1,9 @@
 from collections import deque
-from Utilizables.Register import Buffer
-from Utilizables.BotTelegram import sendmessage
-import schemas
+from .Utils.Register import Buffer
+from .Utils.BotTelegram import sendmessage
+from .services import queue_services as crud
 import asyncio
-import crud
+
 
 
 overflow = 5

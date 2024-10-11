@@ -1,12 +1,15 @@
 from pysnmp.smi.rfc1902 import ObjectIdentity, ObjectType
-from Servicio.Historyqueue import HistoryFIFOQueue
-from Servicio.Alarmqueue import AlarmFIFOQueue
-from Utilizables.Gestionables import Ping
-from Utilizables.Register import Writer
-from slim.slim_get import slim_get
+from .Historyqueue import HistoryFIFOQueue
+from .Alarmqueue import AlarmFIFOQueue
+from .Utils.Gestionables import Ping
+from .Utils.Register import Writer
+from .slim.slim_get import slim_get
+from .services import taskoid_services as crud
+from .schema import taskoid_schemas as schema
+from .schema.history_schemas import addHistory
 import asyncio
-import schemas
-import crud
+
+
 
 
 history = HistoryFIFOQueue()
@@ -20,7 +23,7 @@ async def Totalagentes(id_agent: int, ip_agent: str):
         IDF = []
 
         intervalos = await crud.get_unique_times(id_agent)
-        print(intervalos)
+        # print(intervalos)
         for inter in intervalos:
             TIMES.append(inter)
             features = await crud.get_features_oid(inter, id_agent)
@@ -28,14 +31,14 @@ async def Totalagentes(id_agent: int, ip_agent: str):
             OIDS.append([item.oid for item in features])
             IDF.append([item.id_adminis for item in features])
 
-        return schemas.elements(
+        return schema.elements(
             **{"ID": id_agent, "IP": ip_agent, "TIMES": TIMES, "OIDS": OIDS, "IDF": IDF}
         )
     except Exception:
         print("aglo paso en TotalAgentes")
 
 
-async def Get_SNMP(task: schemas.taskoid):
+async def Get_SNMP(task: schema.taskoid):
     numgets = 0
     while True:
         try:
@@ -53,7 +56,7 @@ async def Get_SNMP(task: schemas.taskoid):
                             "value": round(float(value), 3),
                         }
 
-                        data = schemas.addHistory(**datos)
+                        data = addHistory(**datos)
                         await history.add(data)
                         await alarm.add(data)
 
@@ -78,13 +81,13 @@ class sensorOID:
         for task in self.tasks:
             task.cancel()
         elements = await Totalagentes(self.id, self.ip)
-        print(elements)
+        # print(elements)
         for TIME, OIDS, IDF in zip(elements.TIMES, elements.OIDS, elements.IDF):
             oid = [ObjectType(ObjectIdentity(f"{oid}")) for oid in OIDS]
             self.tasks.append(
                 asyncio.create_task(
                     Get_SNMP(
-                        schemas.taskoid(
+                        schema.taskoid(
                             **{
                                 "TIME": TIME,
                                 "OIDS": oid,

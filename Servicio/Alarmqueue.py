@@ -1,7 +1,8 @@
-from Utilizables.BotTelegram import sendmessage
+from .Utils.BotTelegram import sendmessage
 from collections import deque
+from .services import queue_services as crud
 import asyncio
-import crud
+
 
 
 class AlarmFIFOQueue:
